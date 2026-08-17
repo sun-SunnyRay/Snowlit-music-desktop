@@ -1,27 +1,33 @@
-# Snowlit Music · 桌面版
+# 映雪音乐 · 桌面版
 
-- 显示名：映雪音乐 / Snowlit Music
-- 包名：`snowlitmusic-desktop`，当前版本见 `package.json`（6.0.27）
-- appId：`cn.snowlit.music.desktop`
-- 产物示例：`build/snowlitmusic-desktop-v6.0.27-x64-Setup.exe`
+映雪音乐（Snowlit Music）是一款 Windows 桌面播放器。你可以搜索歌曲、管理歌单、看歌词、登录网易云 / QQ / 酷狗后把账号歌单写到「我的列表」。
 
-播放要先到「设置 → 自定义源」自行在线或本地导入音源。仓库不附带音源脚本，也不附带导入链接清单。
+本仓库只发布播放器本身。克隆或打包之后，还不能直接听歌。
+
+## 使用前请先读
+
+- 仓库**不附带任何音源脚本**，也**不提供导入链接清单**。
+- 播放完全依赖你自己在软件里导入的「自定义源」。请到 **设置 → 基本设置 → 自定义源**，用「在线导入」或「本地导入」。
+- 播放器不会去官方平台拿音频文件。它只把歌名、歌手等信息交给你选中的源；源返回什么链接，播放器就按这个链接播。链接对不对、能不能播、是否侵权，播放器无法校验，也不负责。
+- 导入来路不明的源脚本可能影响你的系统，请自己判断风险。
+- 使用过程中产生的封面、音频等版权数据，请在 24 小时内自行清除。
+- 本项目面向个人学习交流，完全免费。请遵守你所在地的法律法规，尊重版权，支持正版。
+- **禁止**在违反当地法律的情况下使用本软件。因此产生的后果由使用者自行承担。
+- 不接受商业合作或捐赠。
+- 首次打开软件时会看到完整许可协议。继续使用即表示你接受该协议。
+
+没有导入可用的自定义源时，搜索和播放都会失败。这是预期行为，不是安装损坏。
 
 ## 开发
 
-需要 Node ≥ 22。Windows 本机编译 native 模块时还要 Visual Studio 2022 Build Tools。
+需要 Node.js 22 或更高版本。在 Windows 上编译 native 模块时，还需要 Visual Studio 2022 Build Tools。
 
 ```bash
-cd D:\work\XueMusic-desktop
 npm install
 npm run dev
 ```
 
-或用仓库里的脚本（会先加载 vcvars64）：
-
-```bat
-dev-with-vs.bat
-```
+也可以用仓库里的 `dev-with-vs.bat`，它会先加载 `vcvars64`。
 
 ## 打包
 
@@ -29,10 +35,6 @@ dev-with-vs.bat
 npm run pack:win:setup:x64
 ```
 
-安装包在 `build/`。默认关闭自动更新。
+安装包会生成在 `build/`，例如 `snowlitmusic-desktop-v6.0.27-x64-Setup.exe`。默认关闭自动更新。
 
-Windows 配置大致在 `%APPDATA%/snowlitmusic-desktop`。
-
-## License
-
-Apache-2.0（协议正文见应用内许可协议）
+Windows 用户数据大致在 `%APPDATA%/snowlitmusic-desktop`。
