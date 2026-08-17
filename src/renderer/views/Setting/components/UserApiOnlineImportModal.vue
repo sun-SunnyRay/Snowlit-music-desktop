@@ -115,13 +115,13 @@ export default {
         script = await Promise.race([
           this.fetchScript(url),
           new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('在线导入超时。请改用「一键导入推荐源」或「本地导入」。')), 13000)
+            setTimeout(() => reject(new Error('在线导入超时。请改用「本地导入」。')), 13000)
           }),
         ])
       } catch (err) {
         void dialog(this.$t('user_api_import__failed', {
           message: ((err && err.message) || String(err)) +
-            '\n\n电脑访问 GitHub 常失败，请关闭此窗口，改点「一键导入推荐源」（不联网）。',
+            '\n\n电脑访问 GitHub 常失败，请关闭此窗口，改用「本地导入」。',
         }))
         return
       } finally {

@@ -221,40 +221,8 @@ export const listKgDailyTracks = async(cookie: string): Promise<LX.Music.MusicIn
   return extractKgSongs(json).map(mapKgTrack).filter(Boolean) as LX.Music.MusicInfoOnline[]
 }
 
-const KG_RECENT_TRIES: Array<{ path: string, router: string, body: (auth: ReturnType<typeof extractAuth>) => Record<string, unknown> }> = [
-  {
-    path: '/v1/get_list',
-    router: 'playhistory.service.kugou.com',
-    body: (auth) => ({ userid: Number(auth.userid), token: auth.token, page: 1, pagesize: 100, type: 1 }),
-  },
-  {
-    path: '/v1/get_history',
-    router: 'playhistory.service.kugou.com',
-    body: (auth) => ({ userid: Number(auth.userid), token: auth.token, pagesize: 100 }),
-  },
-  {
-    path: '/playhistory/v1/get_list',
-    router: '',
-    body: (auth) => ({ userid: Number(auth.userid), token: auth.token, page: 1, pagesize: 100 }),
-  },
-]
-
-export const listKgRecentTracks = async(cookie: string): Promise<LX.Music.MusicInfoOnline[]> => {
-  const auth = extractAuth(cookie)
-  if (!auth.ready) throw new Error('LOGIN_REQUIRED')
-  for (const tryItem of KG_RECENT_TRIES) {
-    try {
-      const json = await androidGateway(tryItem.path, cookie, tryItem.body(auth), tryItem.router)
-      const tracks = extractKgSongs(json).map(mapKgTrack).filter(Boolean) as LX.Music.MusicInfoOnline[]
-      if (tracks.length) return tracks
-    } catch {}
-  }
-  throw new Error('KG_RECENT_UNSUPPORTED')
-}
-
 export const listKgTracks = async(cookie: string, id: string): Promise<LX.Music.MusicInfoOnline[]> => {
   if (id == 'daily') return listKgDailyTracks(cookie)
-  if (id == 'recent') return listKgRecentTracks(cookie)
   const auth = extractAuth(cookie)
   if (!auth.ready) throw new Error('LOGIN_REQUIRED')
   const listid = parseListId(id)

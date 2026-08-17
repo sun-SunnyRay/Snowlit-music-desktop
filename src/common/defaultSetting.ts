@@ -22,7 +22,7 @@ const defaultSetting: LX.AppSetting = {
   'common.transparentWindow': !isMac,
   // 本地发行：默认关闭自动更新（避免误连官方 LX 更新源）
   'common.tryAutoUpdate': false,
-  'common.showChangeLog': true,
+  'common.showChangeLog': false,
 
   'player.startupAutoPlay': false,
   'player.togglePlayMethod': 'listLoop',
@@ -37,12 +37,12 @@ const defaultSetting: LX.AppSetting = {
   'player.isMaxOutputChannelCount': false,
   'player.mediaDeviceId': 'default',
   'player.isMediaDeviceRemovedStopPlay': false,
-  'player.isShowLyricTranslation': false,
+  'player.isShowLyricTranslation': true,
   'player.isShowLyricRoma': false,
   'player.isSwapLyricTranslationAndRoma': false,
   'player.isS2t': false,
   'player.isPlayLxlrc': !isMac,
-  'player.isSavePlayTime': false,
+  'player.isSavePlayTime': true,
   'player.audioVisualization': false,
   'player.waitPlayEndStop': true,
   'player.waitPlayEndStopTime': '',
@@ -128,8 +128,8 @@ const defaultSetting: LX.AppSetting = {
   'download.isEmbedLyricR': false,
   'download.isUseOtherSource': false,
 
-  'search.isShowHotSearch': false,
-  'search.isShowHistorySearch': false,
+  'search.isShowHotSearch': true,
+  'search.isShowHistorySearch': true,
   'search.isFocusSearchBox': false,
 
   'network.proxy.enable': false,

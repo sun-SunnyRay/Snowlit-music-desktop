@@ -8,11 +8,6 @@
             <use xlink:href="#icon-list-add" />
           </svg>
         </button>
-        <button :class="$style.listsAdd" :aria-label="$t('account_playlist__title')" @click="isShowAccountPlaylistModal = true">
-          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" height="70%" viewBox="0 0 24 24" space="preserve">
-            <use xlink:href="#icon-love" />
-          </svg>
-        </button>
         <button :class="$style.listsAdd" :aria-label="$t('list_update_modal__title')" @click="isShowListUpdateModal = true">
           <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="transform: rotate(45deg);" height="70%" viewBox="0 0 24 24" space="preserve">
             <use xlink:href="#icon-refresh" />
@@ -80,7 +75,6 @@
     <DuplicateMusicModal v-model:visible="isShowDuplicateMusicModal" :list-info="duplicateListInfo" />
     <ListSortModal v-model:visible="isShowListSortModal" :list-info="sortListInfo" />
     <ListUpdateModal v-model:visible="isShowListUpdateModal" />
-    <AccountPlaylistModal v-model:visible="isShowAccountPlaylistModal" />
   </div>
 </template>
 
@@ -91,7 +85,6 @@ import musicSdk from '@renderer/utils/musicSdk'
 import DuplicateMusicModal from './components/DuplicateMusicModal.vue'
 import ListSortModal from './components/ListSortModal.vue'
 import ListUpdateModal from './components/ListUpdateModal.vue'
-import AccountPlaylistModal from './components/AccountPlaylistModal.vue'
 
 import { defaultList, loveList, userLists, fetchingListStatus } from '@renderer/store/list/state'
 import { removeUserList } from '@renderer/store/list/action'
@@ -99,7 +92,7 @@ import { removeUserList } from '@renderer/store/list/action'
 import { ref, watch } from '@common/utils/vueTools'
 import { useRouter } from '@common/utils/vueRouter'
 import { LIST_IDS } from '@common/constants'
-import { isAccountAutoListId, refreshAndPlayAccountAutoList } from '@renderer/store/sourceAccount'
+import { isAccountAutoListId, refreshAndPlayAccountAutoList, syncEmptyAccountList } from '@renderer/store/sourceAccount'
 
 import { dialog } from '@renderer/plugins/Dialog'
 
@@ -123,7 +116,6 @@ export default {
     DuplicateMusicModal,
     ListSortModal,
     ListUpdateModal,
-    AccountPlaylistModal,
   },
   props: {
     listId: {
@@ -141,7 +133,6 @@ export default {
 
     const { handleImportList, handleExportList } = useShare()
     const { isShowListUpdateModal, handleUpdateSourceList } = useListUpdate()
-    const isShowAccountPlaylistModal = ref(false)
     const { isShowListSortModal, sortListInfo, handleSortList } = useSort()
     const { isShowDuplicateMusicModal, duplicateListInfo, handleDuplicateList } = useDuplicate()
     const { handleRename, handleSaveListName, isShowNewList, isNewListLeave, handleCreateList } = useEditList({ dom_lists_list })
@@ -200,7 +191,12 @@ export default {
 
     const handleListToggle = (id) => {
       const openAuto = () => {
-        if (isAccountAutoListId(id)) void refreshAndPlayAccountAutoList(id)
+        if (isAccountAutoListId(id)) {
+          void refreshAndPlayAccountAutoList(id)
+          return
+        }
+        const list = userLists.find(item => item.id == id)
+        if (list) void syncEmptyAccountList(list)
       }
       if (id == props.listId) {
         openAuto()
@@ -244,7 +240,6 @@ export default {
       fetchingListStatus,
       dom_lists_list,
       isShowListUpdateModal,
-      isShowAccountPlaylistModal,
       isShowListSortModal,
       sortListInfo,
       isShowDuplicateMusicModal,

@@ -10,16 +10,11 @@ import {
   cancelRequest,
   setAllowShowUpdateAlert,
 } from '@main/modules/userApi'
-import { importBundledSources } from '@main/modules/userApi/bundledSources'
 import { sendEvent } from '@main/modules/winMain/main'
 
 export default () => {
   mainHandle<string, LX.UserApi.ImportUserApi>(WIN_MAIN_RENDERER_EVENT_NAME.import_user_api, async({ params: script }) => {
     return importApi(script)
-  })
-
-  mainHandle(WIN_MAIN_RENDERER_EVENT_NAME.import_bundled_user_apis, async() => {
-    return importBundledSources()
   })
 
   mainHandle<string[], LX.UserApi.UserApiInfo[]>(WIN_MAIN_RENDERER_EVENT_NAME.remove_user_api, async({ params: apiIds }) => {

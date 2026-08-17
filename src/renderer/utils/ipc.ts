@@ -124,15 +124,6 @@ export const onUpdateNotAvailable = (listener: LX.IpcRendererEventListenerParams
 export const importUserApi = async(fileText: string) => {
   return rendererInvoke<string, LX.UserApi.ImportUserApi>(WIN_MAIN_RENDERER_EVENT_NAME.import_user_api, fileText)
 }
-/** 一键导入安装包内置的推荐音源（不联网） */
-export const importBundledUserApis = async() => {
-  return rendererInvoke<{
-    imported: string[]
-    skipped: string[]
-    failed: Array<{ name: string, message: string }>
-    apiList: LX.UserApi.UserApiInfo[]
-  }>(WIN_MAIN_RENDERER_EVENT_NAME.import_bundled_user_apis)
-}
 export const setUserApi = async(source: LX.UserApi.UserApiSetApiParams): Promise<void> => {
   return rendererInvoke<LX.UserApi.UserApiSetApiParams>(WIN_MAIN_RENDERER_EVENT_NAME.set_user_api, source)
 }

@@ -33,7 +33,6 @@
         <SettingSearch />
         <SettingList />
         <SettingDownload />
-        <SettingSync />
         <SettingHotKey />
         <SettingNetwork />
         <SettingOdc />
@@ -59,8 +58,6 @@ import SettingDesktopLyric from './components/SettingDesktopLyric.vue'
 import SettingSearch from './components/SettingSearch.vue'
 import SettingList from './components/SettingList.vue'
 import SettingDownload from './components/SettingDownload.vue'
-import SettingSync from './components/SettingSync/index.vue'
-import SettingOpenAPI from './components/SettingOpenAPI.vue'
 import SettingHotKey from './components/SettingHotKey.vue'
 import SettingNetwork from './components/SettingNetwork.vue'
 import SettingOdc from './components/SettingOdc.vue'
@@ -80,8 +77,6 @@ export default {
     SettingSearch,
     SettingList,
     SettingDownload,
-    SettingSync,
-    SettingOpenAPI,
     SettingHotKey,
     SettingNetwork,
     SettingOdc,
@@ -106,13 +101,11 @@ export default {
         { id: 'SettingList', title: t('setting__list') },
         { id: 'SettingDownload', title: t('setting__download') },
         { id: 'SettingHotKey', title: t('setting__hot_key') },
-        { id: 'SettingSync', title: t('setting__sync') },
-        { id: 'SettingOpenAPI', title: t('setting__open_api') },
         { id: 'SettingNetwork', title: t('setting__network') },
         { id: 'SettingOdc', title: t('setting__odc') },
         { id: 'SettingBackup', title: t('setting__backup') },
         { id: 'SettingOther', title: t('setting__other') },
-        // 已隐藏：软件更新、关于
+        // 已隐藏：数据同步、开放 API、软件更新、关于
         // { id: 'SettingUpdate', title: t('setting__update') },
         // { id: 'SettingAbout', title: t('setting__about') },
       ]

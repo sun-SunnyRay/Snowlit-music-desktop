@@ -43,11 +43,6 @@ export * from './rendererEvent/rendererEvent'
 export default () => {
   init()
 
-  // 首次无自定义源时，自动写入安装包内推荐源（本地文件，不联网）
-  void import('./bundledSources').then(m => m.ensureBundledSourcesSeeded()).catch(err => {
-    console.error('[Snowlit] ensureBundledSourcesSeeded', err)
-  })
-
   global.lx.event_app.on('main_window_close', () => {
     void closeWindow()
   })

@@ -59,11 +59,7 @@ export default () => {
         }
 
         if (compareVer(version, versionInfo.newVersion!.version) >= 0) return
-      } else if (
-        // 如果当前版本不在已发布的版本中，则不需要显示更新日志
-        ![{ version: versionInfo.newVersion!.version, desc: '' }, ...(versionInfo.newVersion!.history ?? [])]
-          .some(i => i.version == process.versions.app)
-      ) return
+      }
       isShowChangeLog.value = true
     })
   }

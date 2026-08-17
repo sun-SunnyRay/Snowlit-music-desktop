@@ -130,11 +130,12 @@ import useMusicActions from './useMusicActions'
 import useSearch from './useSearch'
 import useListScroll from './useListScroll'
 import useMusicToggle from './useMusicToggle'
+import { LIST_IDS } from '@common/constants'
 import { appSetting } from '@renderer/store/setting'
 import { computed } from '@common/utils/vueTools'
 import {
   accountAutoState,
-  isAccountAutoListId,
+  isDailySource,
   refreshAndPlayAccountAutoList,
   setAccountAutoSource,
 } from '@renderer/store/sourceAccount'
@@ -269,13 +270,13 @@ export default {
 
     const { saveListPosition, restoreScroll } = useListScroll({ props, listRef, list, handleRestoreScroll })
 
-    const showAccountSourceBar = computed(() => isAccountAutoListId(props.listId) && accountAutoState.loggedIn.length > 1)
-    const accountLoggedIn = computed(() => accountAutoState.loggedIn)
+    const accountLoggedIn = computed(() => accountAutoState.loggedIn.filter(isDailySource))
+    const showAccountSourceBar = computed(() => props.listId == LIST_IDS.ACCOUNT_DAILY && accountLoggedIn.value.length > 1)
     const accountSource = computed(() => accountAutoState.source)
     const accountLoading = computed(() => accountAutoState.loading)
     const accountError = computed(() => accountAutoState.error)
     const handleAccountSource = async(id) => {
-      if (id == accountAutoState.source) return
+      if (!isDailySource(id) || id == accountAutoState.source) return
       await setAccountAutoSource(id)
       await refreshAndPlayAccountAutoList(props.listId)
     }

@@ -2,13 +2,18 @@
   <div :class="$style.container">
     <div :class="$style.header">
       <div :class="$style.left">
-        <tag-list :source="source" :tag-id="tagId" :sort-id="sortId" />
-        <sort-tab :source="source" :tag-id="tagId" :sort-id="sortId" />
+        <template v-if="!searchKeyword">
+          <tag-list :source="source" :tag-id="tagId" :sort-id="sortId" />
+          <sort-tab :source="source" :tag-id="tagId" :sort-id="sortId" />
+        </template>
       </div>
       <base-btn :class="$style.btn" outline min @click="visibleOpenSongListModal = true">{{ $t('songlist__import_input_show_btn') }}</base-btn>
       <base-selection :model-value="source" :class="$style.select" :list="sourceList" item-key="id" item-name="name" @update:model-value="handleToggleSource" />
     </div>
-    <list-view :source="source" :tag-id="tagId" :sort-id="sortId" :page="page" />
+    <div :class="$style.main">
+      <song-list-search v-if="searchKeyword" :page="page" :source-id="searchSourceId" />
+      <list-view v-else :source="source" :tag-id="tagId" :sort-id="sortId" :page="page" />
+    </div>
     <open-list-modal v-model="visibleOpenSongListModal" :source-list="sourceList" />
   </div>
 </template>
@@ -20,7 +25,10 @@ import TagList from './components/TagList.vue'
 import SortTab from './components/SortTab.vue'
 import OpenListModal from './components/OpenListModal.vue'
 import ListView from './ListView.vue'
+import SongListSearch from '@renderer/views/Search/SongListList/index.vue'
 import { sources, listInfo, isVisibleListDetail } from '@renderer/store/songList/state'
+import { sources as searchSongListSources } from '@renderer/store/search/songlist'
+import { searchText } from '@renderer/store/search/state'
 import { sourceNames } from '@renderer/store'
 import { useRoute, useRouter } from '@common/utils/vueRouter'
 
@@ -35,6 +43,7 @@ interface Query {
   tagId?: string
   sortId?: string
   page?: string
+  text?: string
 }
 
 const verifyQueryParams = async function(this: any, to: { query: Query, path: string }, from: any, next: (route?: { path: string, query: Query }) => void) {
@@ -71,6 +80,8 @@ const verifyQueryParams = async function(this: any, to: { query: Query, path: st
   tagId.value = _tagId ?? ''
   sortId.value = _sortId ?? ''
   page.value = _page ? parseInt(_page) : 1
+  if (to.query.text != null) searchText.value = to.query.text
+  else searchText.value = ''
   void setSongListSetting({ source: _source, tagId: _tagId, sortId: _sortId })
 }
 
@@ -81,6 +92,7 @@ export default {
     SortTab,
     ListView,
     OpenListModal,
+    SongListSearch,
   },
   beforeRouteEnter: verifyQueryParams,
   beforeRouteUpdate: verifyQueryParams,
@@ -94,14 +106,23 @@ export default {
     const route = useRoute()
     const handleToggleSource = (id: LX.OnlineSource) => {
       if (id == source.value) return
+      const text = typeof route.query.text == 'string' ? route.query.text : ''
       void router.replace({
         path: route.path,
         query: {
           source: id,
           tagId: '',
+          page: 1,
+          ...(text ? { text } : {}),
         },
       })
     }
+
+    const searchKeyword = computed(() => String(route.query.text || ''))
+    const searchSourceId = computed(() => {
+      if (searchSongListSources.includes(source.value)) return source.value
+      return 'all'
+    })
 
     return {
       source,
@@ -111,6 +132,8 @@ export default {
       sourceList,
       handleToggleSource,
       visibleOpenSongListModal,
+      searchKeyword,
+      searchSourceId,
     }
   },
 }
@@ -138,6 +161,11 @@ export default {
   flex: auto;
   display: flex;
   flex-flow: row nowrap;
+}
+.main {
+  position: relative;
+  flex: auto;
+  min-height: 0;
 }
 
 .btn {

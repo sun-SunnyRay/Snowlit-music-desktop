@@ -210,6 +210,15 @@ export const play = () => {
   sendDesktopLyricInfo({ action: 'set_play', data: currentTime })
 }
 
+export const seek = (time: number) => {
+  if (!lrc) return
+  lrc.play(time)
+  sendDesktopLyricInfo({ action: 'set_play', data: time })
+  if (isPlay.value) return
+  lrc.pause()
+  sendDesktopLyricInfo({ action: 'set_pause' })
+}
+
 export const pause = () => {
   lrc.pause()
   sendDesktopLyricInfo({ action: 'set_pause' })

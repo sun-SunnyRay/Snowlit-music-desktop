@@ -30,9 +30,9 @@ export default {
       return [
         {
           to: '/search',
-          tips: t('search'),
-          icon: '#icon-search-2',
-          iconSize: '0 0 425.2 425.2',
+          tips: t('home'),
+          icon: '#icon-home',
+          iconSize: '0 0 24 24',
           size,
           name: 'Search',
           enable: true,
@@ -98,13 +98,8 @@ export default {
 
 .menu {
   flex: auto;
-  // &.controlBtnLeft {
-  //   display: flex;
-  //   flex-flow: column nowrap;
-  //   justify-content: center;
-  //   padding-bottom: @control-btn-height;
-  // }
-  // padding: 5px;
+  min-height: 0;
+  overflow: auto;
 }
 .list {
   -webkit-app-region: no-drag;

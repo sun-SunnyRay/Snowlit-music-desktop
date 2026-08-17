@@ -3,15 +3,22 @@
     <ControlBtns v-if="appSetting['common.controlBtnPosition'] == 'left'" />
     <div v-else :class="$style.logo">Snowlit</div>
     <NavBar />
+    <AccountBtn :active="isShowAccountModal" @open="isShowAccountModal = true" />
+    <AccountPlaylistModal v-model:visible="isShowAccountModal" />
   </div>
 </template>
 
 <script setup>
+import { ref } from '@common/utils/vueTools'
 import { isFullscreen } from '@renderer/store'
 import { appSetting } from '@renderer/store/setting'
 
 import ControlBtns from './ControlBtns.vue'
 import NavBar from './NavBar.vue'
+import AccountBtn from './AccountBtn.vue'
+import AccountPlaylistModal from './AccountPlaylistModal.vue'
+
+const isShowAccountModal = ref(false)
 
 </script>
 

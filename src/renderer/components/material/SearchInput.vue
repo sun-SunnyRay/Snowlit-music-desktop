@@ -31,8 +31,11 @@
           </slot>
         </button>
       </div>
-      <div v-if="list" :class="$style.list" :style="listStyle">
-        <ul ref="dom_list" @mouseleave="selectIndex = -1">
+      <div :class="$style.list" :style="listStyle" @mousedown.prevent>
+        <div v-if="!text" ref="dom_list">
+          <slot name="empty" />
+        </div>
+        <ul v-else ref="dom_list" @mouseleave="selectIndex = -1">
           <li
             v-for="(item, index) in list"
             :key="item"
@@ -95,25 +98,29 @@ export default {
     }
   },
   watch: {
-    list(n) {
+    list() {
       if (!this.visibleList) return
       if (this.selectIndex > -1) this.selectIndex = -1
-      this.$nextTick(() => {
-        this.listStyle.height = this.$refs.dom_list.scrollHeight + 'px'
-      })
+      this.$nextTick(this.updateListHeight)
     },
     modelValue(n) {
       this.text = n
+      if (!this.visibleList) return
+      this.$nextTick(this.updateListHeight)
     },
     visibleList(n) {
       n ? this.showList() : this.hideList()
     },
   },
   mounted() {
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.visibleList) this.updateListHeight()
+    })
     if (appSetting['search.isFocusSearchBox']) this.handleFocusInput()
     this.handleRegisterEvent('on')
   },
   beforeUnmount() {
+    this.resizeObserver.disconnect()
     this.handleRegisterEvent('off')
   },
   methods: {
@@ -148,13 +155,26 @@ export default {
       }
       this.sendEvent('listClick', this.selectIndex)
     },
+    updateListHeight() {
+      const el = this.$refs.dom_list
+      if (el && this.observedEl !== el) {
+        if (this.observedEl) this.resizeObserver.unobserve(this.observedEl)
+        this.resizeObserver.observe(el)
+        this.observedEl = el
+      }
+      if (!el || !this.visibleList) {
+        this.listStyle.height = '0px'
+        return
+      }
+      this.listStyle.height = Math.min(el.scrollHeight, 320) + 'px'
+    },
     showList() {
       this.isShow = true
-      this.listStyle.height = this.$refs.dom_list.scrollHeight + 'px'
+      this.$nextTick(this.updateListHeight)
     },
     hideList() {
       this.isShow = false
-      this.listStyle.height = 0
+      this.listStyle.height = '0px'
       this.$nextTick(() => {
         this.selectIndex = -1
       })
@@ -210,6 +230,7 @@ export default {
 
 .search {
   position: absolute;
+  z-index: 5;
   width: 100%;
   border-radius: @form-radius;
   transition: box-shadow @transition-normal, background-color @transition-fast;
@@ -288,6 +309,7 @@ export default {
     height: 0;
     transition-property: height;
     overflow: hidden;
+    overflow-y: auto;
     li {
       cursor: pointer;
       padding: 8px 5px;

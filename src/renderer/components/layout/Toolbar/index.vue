@@ -55,7 +55,5 @@ import SearchInput from './SearchInput.vue'
   font-weight: bold;
   font-size: 13px;
   letter-spacing: 0.02em;
-  // -webkit-app-region: no-drag;
 }
-
 </style>

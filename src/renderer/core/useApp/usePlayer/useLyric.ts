@@ -5,6 +5,7 @@ import { debounce } from '@common/utils/common'
 import {
   pause,
   play,
+  seek,
   setLyric,
   stop,
   init,
@@ -28,6 +29,10 @@ export default () => {
   watch(() => appSetting['player.isSwapLyricTranslationAndRoma'], setLyric)
   watch(() => appSetting['player.isPlayLxlrc'], setLyric)
 
+  const handleSetProgress = (time: number) => {
+    seek(time * 1000)
+  }
+
   window.app_event.on('play', play)
   window.app_event.on('pause', pause)
   window.app_event.on('stop', stop)
@@ -35,6 +40,7 @@ export default () => {
   window.app_event.on('musicToggled', setPlayInfo)
   window.app_event.on('lyricUpdated', setLyric)
   window.app_event.on('setPlaybackRate', handleApplyPlaybackRate)
+  window.app_event.on('setProgress', handleSetProgress)
 
   onBeforeUnmount(() => {
     window.app_event.off('play', play)
@@ -44,5 +50,6 @@ export default () => {
     window.app_event.off('musicToggled', setPlayInfo)
     window.app_event.off('lyricUpdated', setLyric)
     window.app_event.off('setPlaybackRate', handleApplyPlaybackRate)
+    window.app_event.off('setProgress', handleSetProgress)
   })
 }

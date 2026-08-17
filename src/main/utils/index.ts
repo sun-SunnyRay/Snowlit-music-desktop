@@ -111,6 +111,9 @@ const applyInitSetting = (setting: LX.AppSetting) => {
   if (global.envParams.cmdParams.hidden && !setting['tray.enable']) {
     setting['tray.enable'] = true
   }
+  setting['sync.enable'] = false
+  setting['openAPI.enable'] = false
+  setting['common.showChangeLog'] = false
 }
 
 export const updateSetting = (setting?: Partial<LX.AppSetting>, isInit: boolean = false) => {

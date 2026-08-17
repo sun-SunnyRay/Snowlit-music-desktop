@@ -5,6 +5,8 @@ import { play } from '@renderer/core/player/action'
 import { appSetting } from '@renderer/store/setting'
 // import { player as eventPlayerNames } from '@renderer/event/names'
 
+const CLICK_SEEK_PX = 8
+
 export default ({ isPlay, lyric, playProgress, isShowLyricProgressSetting, offset }) => {
   const dom_lyric = ref(null)
   const dom_lyric_text = ref(null)
@@ -26,6 +28,30 @@ export default ({ isPlay, lyric, playProgress, isShowLyricProgressSetting, offse
   let time = -1
   let dom_pre_line = null
   let isSkipMouseEnter = false
+  let press = null
+
+  const progressFromLineTime = (lineTimeMs) => {
+    let progress = Math.max(lineTimeMs - lyric.offset - lyric.tempOffset, 0) / 1000
+    if (progress > playProgress.maxPlayTime) progress = playProgress.maxPlayTime
+    return progress
+  }
+
+  const findLineEl = (el) => {
+    const root = dom_lyric.value
+    while (el && el !== root) {
+      if (el.time != null) return el
+      el = el.parentNode
+    }
+    return null
+  }
+
+  const seekToLineEl = (el) => {
+    const line = findLineEl(el)
+    if (!line || line.time == null) return
+    clearLyricScrollTimeout()
+    isStopScroll.value = false
+    window.app_event.setProgress(progressFromLineTime(line.time))
+  }
 
   const handleSkipPlay = () => {
     if (time == -1) return
@@ -57,20 +83,15 @@ export default ({ isPlay, lyric, playProgress, isShowLyricProgressSetting, offse
     }
     if (dom.time == null) {
       if (lyric.lines.length) {
-        time = dom.classList.contains('pre') ? 0 : lyric.lines[lyric.lines.length - 1].time ?? 0
-        time = Math.max(time - lyric.offset - lyric.tempOffset, 0)
-        time /= 1000
-        if (time > playProgress.maxPlayTime) time = playProgress.maxPlayTime
+        const lineTime = dom.classList.contains('pre') ? 0 : lyric.lines[lyric.lines.length - 1].time ?? 0
+        time = progressFromLineTime(lineTime)
         timeStr.value = formatPlayTime2(time)
       } else {
         time = -1
         timeStr.value = '--:--'
       }
     } else {
-      time = dom.time
-      time = Math.max(time - lyric.offset - lyric.tempOffset, 0)
-      time /= 1000
-      if (time > playProgress.maxPlayTime) time = playProgress.maxPlayTime
+      time = progressFromLineTime(dom.time)
       timeStr.value = formatPlayTime2(time)
     }
     dom_pre_line = dom
@@ -101,7 +122,7 @@ export default ({ isPlay, lyric, playProgress, isShowLyricProgressSetting, offse
       handleScrollLrc()
     }, 3000)
   }
-  const handleLyricDown = (y) => {
+  const handleLyricDown = (y, x, target) => {
     // console.log(event)
     if (delayScrollTimeout) {
       clearTimeout(delayScrollTimeout)
@@ -110,18 +131,43 @@ export default ({ isPlay, lyric, playProgress, isShowLyricProgressSetting, offse
     isMsDown.value = true
     msDownY = y
     msDownScrollY = dom_lyric.value.scrollTop
+    press = { x, y, target }
   }
   const handleLyricMouseDown = event => {
-    handleLyricDown(event.clientY)
+    if (event.button !== 0) return
+    handleLyricDown(event.clientY, event.clientX, event.target)
   }
   const handleLyricTouchStart = event => {
     if (event.changedTouches.length) {
       const touch = event.changedTouches[0]
-      handleLyricDown(touch.clientY)
+      handleLyricDown(touch.clientY, touch.clientX, event.target)
     }
   }
-  const handleMouseMsUp = event => {
+  const handlePointerUp = (x, y) => {
+    const wasDown = isMsDown.value
     isMsDown.value = false
+    if (!wasDown || !press) {
+      press = null
+      return
+    }
+    const dx = x - press.x
+    const dy = y - press.y
+    const target = press.target
+    press = null
+    if ((dx * dx + dy * dy) > CLICK_SEEK_PX * CLICK_SEEK_PX) return
+    seekToLineEl(target)
+  }
+  const handleMouseMsUp = event => {
+    handlePointerUp(event.clientX, event.clientY)
+  }
+  const handleTouchEnd = event => {
+    if (event.changedTouches.length) {
+      const touch = event.changedTouches[0]
+      handlePointerUp(touch.clientX, touch.clientY)
+      return
+    }
+    isMsDown.value = false
+    press = null
   }
   const handleMove = (y) => {
     if (isMsDown.value) {
@@ -210,7 +256,7 @@ export default ({ isPlay, lyric, playProgress, isShowLyricProgressSetting, offse
     document.addEventListener('mousemove', handleMouseMsMove)
     document.addEventListener('mouseup', handleMouseMsUp)
     document.addEventListener('touchmove', handleTouchMove)
-    document.addEventListener('touchend', handleMouseMsUp)
+    document.addEventListener('touchend', handleTouchEnd)
 
     initLrc(lyric.lines, null)
   })
@@ -219,7 +265,7 @@ export default ({ isPlay, lyric, playProgress, isShowLyricProgressSetting, offse
     document.removeEventListener('mousemove', handleMouseMsMove)
     document.removeEventListener('mouseup', handleMouseMsUp)
     document.removeEventListener('touchmove', handleTouchMove)
-    document.removeEventListener('touchend', handleMouseMsUp)
+    document.removeEventListener('touchend', handleTouchEnd)
   })
 
   return {

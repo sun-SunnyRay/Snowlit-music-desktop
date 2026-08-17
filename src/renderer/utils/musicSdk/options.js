@@ -1,7 +1,7 @@
 export const bHh = '624868746c'
 
 export const headers = {
-  'User-Agent': 'snowlit-music request',
+  'User-Agent': 'lx-music request',
   [bHh]: [bHh],
 }
 

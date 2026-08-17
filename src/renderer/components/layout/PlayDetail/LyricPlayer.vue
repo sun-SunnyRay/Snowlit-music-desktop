@@ -211,6 +211,9 @@ export default {
   cursor: grab;
   &.draging {
     cursor: grabbing;
+    :global(.line-content) {
+      cursor: grabbing;
+    }
   }
   :global {
     .font-lrc {
@@ -221,8 +224,13 @@ export default {
       padding: calc(var(--playDetail-lrc-font-size, 16px) / 2) 1px;
       overflow-wrap: break-word;
       color: var(--color-450);
+      cursor: pointer;
       transition: @transition-normal;
-      transition-property: padding;
+      transition-property: padding, color;
+
+      &:hover:not(.active) .font-lrc {
+        color: var(--color-primary-dark-100);
+      }
 
       .extended {
         font-size: 0.8em;

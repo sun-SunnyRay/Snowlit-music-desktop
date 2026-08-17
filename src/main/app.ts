@@ -138,7 +138,7 @@ export const setUserDataPath = () => {
 
   const userDataPath = app.getPath('userData')
   global.lxOldDataPath = userDataPath
-  global.lxDataPath = path.join(userDataPath, 'LxDatas')
+  global.lxDataPath = path.join(userDataPath, 'SnowlitDatas')
   if (!existsSync(global.lxDataPath)) mkdirSync(global.lxDataPath)
 }
 
@@ -284,7 +284,7 @@ const initTheme = () => {
 }
 
 const backupDB = (backupPath: string) => {
-  const dbPath = path.join(global.lxDataPath, 'lx.data.db')
+  const dbPath = path.join(global.lxDataPath, 'snowlit.data.db')
   try {
     renameSync(dbPath, backupPath)
   } catch {}
@@ -309,7 +309,7 @@ export const initAppSetting = async() => {
   if (!isInitialized) {
     let dbFileExists = await global.lx.worker.dbService.init(global.lxDataPath)
     if (dbFileExists === null) {
-      const backupPath = path.join(global.lxDataPath, `lx.data.db.${Date.now()}.bak`)
+      const backupPath = path.join(global.lxDataPath, `snowlit.data.db.${Date.now()}.bak`)
       dialog.showMessageBoxSync({
         type: 'warning',
         message: 'Database verify failed',
