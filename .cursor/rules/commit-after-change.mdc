@@ -1,0 +1,14 @@
+---
+description: After each finished change, commit locally so the working tree stays current
+alwaysApply: true
+---
+
+# Commit after each change
+
+When a task finishes with source or project-file edits, make a local git commit before you stop. Do not leave a dirty tree for later.
+
+- Commit only what this change needs. One logical change, one commit.
+- Do not push. Do not update git config. Do not skip hooks.
+- Author stays `XueMusic <xuemusic@local>` via env or `git -c`, never `git config`.
+- Do not commit secrets, APKs, `build/` installers, or empty `branding/`.
+- If there is nothing to commit, say so. Do not create an empty commit.
