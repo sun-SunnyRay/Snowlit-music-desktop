@@ -1,15 +1,12 @@
 from PIL import Image
 from pathlib import Path
 
-candidates = [
-    Path(r"D:\XueMusic\branding\snowlit_launcher_master.png"),
-    Path(r"D:\XueMusic\snowlit_launcher_icon.png"),
-]
-src = next((p for p in candidates if p.exists()), None)
-if src is None:
-    raise SystemExit("branding image not found")
+root = Path(__file__).resolve().parents[1]
+src = root / "branding" / "snowlit_launcher_master.png"
+if not src.exists():
+    raise SystemExit(f"branding image not found: {src}")
 
-out_dir = Path(r"D:\XueMusic\desktop\XueMusic-desktop\resources\icons")
+out_dir = root / "resources" / "icons"
 out_dir.mkdir(parents=True, exist_ok=True)
 
 img = Image.open(src).convert("RGBA")
@@ -27,6 +24,11 @@ for s in (16, 32, 48, 64, 128, 256, 512):
 icon_png = out_dir / "icon.png"
 img.resize((512, 512), Image.Resampling.LANCZOS).save(icon_png, "PNG")
 print("wrote", icon_png)
+
+doc_icon = root / "doc" / "images" / "icon.png"
+doc_icon.parent.mkdir(parents=True, exist_ok=True)
+img.resize((512, 512), Image.Resampling.LANCZOS).save(doc_icon, "PNG")
+print("wrote", doc_icon)
 
 ico_path = out_dir / "icon.ico"
 img.resize((256, 256), Image.Resampling.LANCZOS).save(
