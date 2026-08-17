@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { existsSync, mkdirSync, renameSync } from 'fs'
+import { copyFileSync, existsSync, mkdirSync, renameSync } from 'fs'
 import { app, shell, screen, nativeTheme, dialog } from 'electron'
 import { URL_SCHEME_RXP } from '@common/constants'
 import { getProxy, getTheme, initHotKey, initSetting, parseEnvParams } from './utils'
@@ -140,6 +140,25 @@ export const setUserDataPath = () => {
   global.lxOldDataPath = userDataPath
   global.lxDataPath = path.join(userDataPath, 'SnowlitDatas')
   if (!existsSync(global.lxDataPath)) mkdirSync(global.lxDataPath)
+  seedSnowlitFromLxDatas(userDataPath, global.lxDataPath)
+}
+
+const seedSnowlitFromLxDatas = (userDataPath: string, dest: string) => {
+  const src = path.join(userDataPath, 'LxDatas')
+  if (!existsSync(src) || existsSync(path.join(dest, 'config_v2.json'))) return
+
+  const copy = (fromName: string, toName = fromName) => {
+    const from = path.join(src, fromName)
+    if (!existsSync(from)) return
+    copyFileSync(from, path.join(dest, toName))
+  }
+  copy('config_v2.json')
+  copy('data.json')
+  copy('user_api.json')
+  copy('hot_key.json')
+  copy('lx.data.db', 'snowlit.data.db')
+  copy('lx.data.db-wal', 'snowlit.data.db-wal')
+  copy('lx.data.db-shm', 'snowlit.data.db-shm')
 }
 
 export const registerDeeplink = (startApp: () => void) => {

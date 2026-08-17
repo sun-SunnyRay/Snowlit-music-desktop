@@ -1,6 +1,6 @@
 {
   "name": "snowlitmusic-desktop",
-  "version": "6.0.25",
+  "version": "6.0.27",
   "description": "Snowlit Music desktop",
   "main": "./dist/main.js",
   "scripts": {

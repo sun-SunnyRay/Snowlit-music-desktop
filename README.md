@@ -1,9 +1,9 @@
 # Snowlit Music · 桌面版
 
 - 显示名：映雪音乐 / Snowlit Music
-- 包名：`snowlitmusic-desktop`，当前版本见 `package.json`（6.0.25）
+- 包名：`snowlitmusic-desktop`，当前版本见 `package.json`（6.0.27）
 - appId：`cn.snowlit.music.desktop`
-- 产物示例：`build/snowlitmusic-desktop-v6.0.25-x64-Setup.exe`
+- 产物示例：`build/snowlitmusic-desktop-v6.0.27-x64-Setup.exe`
 
 播放要先到「设置 → 自定义源」在线或本地导入音源。仓库不附带推荐源脚本。导入链接见 [doc/音源导入链接.md](doc/音源导入链接.md)。
 
