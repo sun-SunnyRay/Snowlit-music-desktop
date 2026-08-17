@@ -20,11 +20,7 @@ material-modal(:show="versionInfo.showModal" max-width="60%" @close="handleClose
         div(:class="$style.desc")
           p 更新信息获取失败，可能是无法访问 GitHub 导致的，请手动检查更新！
           p
-            | 检查方法：打开
-            base-btn(min aria-label="点击打开" @click="handleOpenUrl('https://github.com/lyswhut/lx-music-desktop/releases')") 软件发布页
-            | ，查看「Latest」发布的
-            strong 版本号
-            | 与当前版本({{ versionInfo.version }})对比是否一致。
+            | 检查方法：对照当前版本({{ versionInfo.version }})与你拿到的安装包版本号是否一致。
           p 若一致则不必理会该弹窗，直接关闭即可；否则请手动下载新版本更新。
     div(:class="$style.footer")
       div(:class="$style.btns")
@@ -73,12 +69,6 @@ material-modal(:show="versionInfo.showModal" max-width="60%" @close="handleClose
     div(:class="$style.footer")
       div(:class="$style.desc")
         p 发现有新版本啦，你可以选择自动更新或手动更新。
-        p 手动更新可以去&nbsp;
-          strong.hover.underline(aria-label="点击打开" @click="handleOpenUrl('https://github.com/lyswhut/lx-music-desktop/releases')") 软件发布页
-          | 下载。
-        p 若遇到问题可以阅读
-          strong.hover.underline(aria-label="点击打开" @click="handleOpenUrl('https://lyswhut.github.io/lx-music-doc/desktop/faq')") 桌面版常见问题
-          | 。
         p(v-if="progress") 当前下载进度：{{ progress }}
         p(v-else) &nbsp;
       div(:class="$style.btns")

@@ -9,16 +9,13 @@ const afterPack = require('./build-after-pack')
 * @see https://www.electron.build/configuration/configuration
 */
 const options = {
-  // 独立 appId，避免与官方洛雪桌面共用配置目录
   appId: 'cn.snowlit.music.desktop',
   productName: 'snowlitmusic-desktop',
   beforePack,
   afterPack,
   protocols: {
-    // 保留 lxmusic scheme，兼容社区脚本 / Scheme URL
     name: 'snowlit-music-protocol',
     schemes: [
-      'lxmusic',
       'snowlitmusic',
     ],
   },
@@ -46,12 +43,6 @@ const options = {
   },
   extraResources: [
     './licenses',
-    // 内置推荐音源脚本（一键导入，无需 GitHub）
-    {
-      from: './resources/user-apis',
-      to: 'user-apis',
-      filter: ['**/*'],
-    },
   ],
   // 本地发行：不配置官方 LX 更新源（避免误更新）
   publish: [],
@@ -95,7 +86,7 @@ const linuxOptions = {
         'Name[zh_CN]': '映雪音乐',
         'Name[zh_TW]': '映雪音樂',
         Encoding: 'UTF-8',
-        MimeType: 'x-scheme-handler/lxmusic;x-scheme-handler/snowlitmusic',
+        MimeType: 'x-scheme-handler/snowlitmusic',
         StartupNotify: 'false',
       },
     },

@@ -1,7 +1,7 @@
 {
   "name": "snowlitmusic-desktop",
-  "version": "6.0.20",
-  "description": "映雪音乐（Snowlit Music）桌面版 — 基于洛雪音乐助手",
+  "version": "6.0.25",
+  "description": "Snowlit Music desktop",
   "main": "./dist/main.js",
   "scripts": {
     "pack": "node build-config/pack.js && npm run pack:win:setup:x64",

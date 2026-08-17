@@ -1,7 +1,7 @@
 <template lang="pug">
 dt#sync
   | {{ $t('setting__sync') }}
-  button(class="help-btn" :aria-label="$t('setting__sync_tip')" @click="openUrl('https://lyswhut.github.io/lx-music-doc/desktop/faq/sync')")
+  button(class="help-btn" :aria-label="$t('setting__sync_tip')")
     svg-icon(name="help-circle-outline")
 dd
   base-checkbox(id="setting_sync_enable" :model-value="appSetting['sync.enable']" :label="$t('setting__sync_enable')" @update:model-value="updateSetting({ 'sync.enable': $event })")
@@ -21,7 +21,6 @@ SyncServer(v-else)
 <script>
 // import { computed } from '@common/utils/vueTools'
 import { sync } from '@renderer/store'
-import { openUrl } from '@common/utils/electron'
 import { appSetting, updateSetting } from '@renderer/store/setting'
 import SyncServer from './SyncServer.vue'
 import SyncClient from './SyncClient.vue'
@@ -37,7 +36,6 @@ export default {
       appSetting,
       updateSetting,
       sync,
-      openUrl,
     }
   },
 }

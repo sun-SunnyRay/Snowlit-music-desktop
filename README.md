@@ -1,27 +1,38 @@
-# 映雪音乐 · 桌面版（Snowlit Music Desktop）
+# Snowlit Music · 桌面版
 
-基于开源项目 **LX Music（洛雪音乐助手）桌面版** 的本地发行。
+- 显示名：映雪音乐 / Snowlit Music
+- 包名：`snowlitmusic-desktop`，当前版本见 `package.json`（6.0.25）
+- appId：`cn.snowlit.music.desktop`
+- 产物示例：`build/snowlitmusic-desktop-v6.0.25-x64-Setup.exe`
 
-- 显示名：**映雪音乐** / Snowlit Music  
-- 版本见 `package.json`（当前与手机产品线对齐 **6.0.20**）  
-- **无内置融合调度音源**；使用「自定义源」在线导入社区音源即可  
+播放要先到「设置 → 自定义源」在线或本地导入音源。仓库不附带推荐源脚本。导入链接见 [doc/音源导入链接.md](doc/音源导入链接.md)。
 
-更完整的说明见 [SNOWLIT.md](./SNOWLIT.md)、版本约定见 [VERSIONING.md](./VERSIONING.md)。
+## 开发
 
-上游项目：https://github.com/lyswhut/lx-music-desktop  
-
-## 快速开始
+需要 Node ≥ 22。Windows 本机编译 native 模块时还要 Visual Studio 2022 Build Tools。
 
 ```bash
+cd D:\work\XueMusic-desktop
 npm install
 npm run dev
 ```
 
+或用仓库里的脚本（会先加载 vcvars64）：
+
+```bat
+dev-with-vs.bat
+```
+
+## 打包
+
 ```bash
-# Windows x64 安装包
 npm run pack:win:setup:x64
 ```
 
+安装包在 `build/`。默认关闭自动更新。
+
+Windows 配置大致在 `%APPDATA%/snowlitmusic-desktop`。
+
 ## License
 
-Apache-2.0（与上游一致；协议正文见应用内许可协议）
+Apache-2.0（协议正文见应用内许可协议）

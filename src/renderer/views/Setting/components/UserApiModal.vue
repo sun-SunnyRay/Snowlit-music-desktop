@@ -20,10 +20,8 @@ material-modal(:show="modelValue" bg-close teleport="#view" @close="handleClose"
     div(:class="$style.note")
       p(:class="[$style.ruleLink]")
         | {{ $t('user_api__readme') }}
-        span.hover.underline(aria-label="https://lxmusic.toside.cn/desktop/custom-source" @click="handleOpenUrl('https://lyswhut.github.io/lx-music-doc/desktop/custom-source')") FAQ
       p {{ $t('user_api__note') }}
     div(:class="$style.footer")
-      base-btn(:class="$style.footerBtn" :disabled="bundledImporting" @click="handleImportBundled") {{ bundledImporting ? '导入中...' : $t('user_api__btn_import_bundled') }}
       base-btn(:class="$style.footerBtn" @click="isShowOnlineImportModal = true") {{ $t('user_api__btn_import_online') }}
       base-btn(:class="$style.footerBtn" @click="handleImport") {{ $t('user_api__btn_import') }}
       //- base-btn(:class="$style.footerBtn" @click="handleExport") {{ $t('user_api__btn_export') }}
@@ -31,9 +29,8 @@ material-modal(:show="modelValue" bg-close teleport="#view" @close="handleClose"
 </template>
 
 <script>
-import { importUserApi, importBundledUserApis, removeUserApi, showSelectDialog, setAllowShowUserApiUpdateAlert, getUserApiList } from '@renderer/utils/ipc'
+import { importUserApi, removeUserApi, showSelectDialog, setAllowShowUserApiUpdateAlert, getUserApiList } from '@renderer/utils/ipc'
 import { readFile } from '@common/utils/nodejs'
-import { openUrl } from '@common/utils/electron'
 import apiSourceInfo from '@renderer/utils/musicSdk/api-source-info'
 import { userApi } from '@renderer/store'
 import { appSetting, updateSetting } from '@renderer/store/setting'
@@ -55,7 +52,6 @@ export default {
   emits: ['update:modelValue'],
   setup() {
     const isShowOnlineImportModal = ref(false)
-    const bundledImporting = ref(false)
     const apiList = computed(() => userApi.list)
 
     return {
@@ -63,13 +59,11 @@ export default {
       apiList,
       appSetting,
       isShowOnlineImportModal,
-      bundledImporting,
     }
   },
   watch: {
     modelValue(show) {
       if (show) {
-        // 打开时刷新列表（启动时可能刚自动写入了内置源）
         void getUserApiList().then(list => {
           userApi.list = list
         }).catch(() => {})
@@ -83,40 +77,6 @@ export default {
       }).catch((err) => {
         void dialog(this.$t('user_api_import__failed', { message: err.message }))
       })
-    },
-    /** 不联网：从安装包内 resources/user-apis 导入（绝不自动切源，避免初始化卡住） */
-    async handleImportBundled() {
-      if (this.bundledImporting) return
-      this.bundledImporting = true
-      try {
-        // 防永久卡住：15 秒硬超时
-        const result = await Promise.race([
-          importBundledUserApis(),
-          new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('导入超时（15s）。请关闭软件后重开再试，或用「本地导入」选 js 文件。')), 15000)
-          }),
-        ])
-        userApi.list = result.apiList
-        if (!result.imported.length && !result.skipped.length) {
-          const detail = result.failed?.length
-            ? result.failed.map(f => `${f.name}: ${f.message}`).join('\n')
-            : (result.dir ? `目录: ${result.dir}` : '')
-          void dialog(this.$t('user_api__import_bundled_empty') + (detail ? `\n${detail}` : ''))
-          return
-        }
-        void dialog(
-          this.$t('user_api__import_bundled_ok', {
-            imported: result.imported.join('、') || '无',
-            skipped: result.skipped.join('、') || '无',
-            failed: result.failed.length ? result.failed.map(f => `${f.name}(${f.message})`).join('、') : '无',
-          }) +
-          '\n\n请在「基本设置 → 自定义源」里手动点选刚导入的源再搜歌。',
-        )
-      } catch (err) {
-        void dialog(this.$t('user_api_import__failed', { message: err.message || String(err) }))
-      } finally {
-        this.bundledImporting = false
-      }
     },
     handleImport() {
       if (this.userApi.list.length > 20) {
@@ -155,9 +115,6 @@ export default {
     },
     handleClose() {
       this.$emit('update:modelValue', false)
-    },
-    handleOpenUrl(url) {
-      void openUrl(url)
     },
     handleChangeAllowUpdateAlert(api, enable) {
       void setAllowShowUserApiUpdateAlert(api.id, enable)

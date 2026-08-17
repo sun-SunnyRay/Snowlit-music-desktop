@@ -19,7 +19,7 @@ export default () => {
   const handleLinkAction = async(link: string) => {
     // console.log(link)
     const [url, search] = link.split('?')
-    const [type, action, ...paths] = url.replace(/^(?:lxmusic|snowlitmusic):\/\//, '').split('/')
+    const [type, action, ...paths] = url.replace(/^snowlitmusic:\/\//, '').split('/')
     const params: {
       paths: string[]
       data?: any

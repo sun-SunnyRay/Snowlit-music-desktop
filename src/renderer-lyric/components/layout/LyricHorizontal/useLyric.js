@@ -87,7 +87,6 @@ export default (isComputeHeight) => {
       winEvent.msDownY = y
       winEvent.windowW = window.innerWidth
       winEvent.windowH = window.innerHeight
-      // https://github.com/lyswhut/lx-music-desktop/issues/2244
       if (isWin) setWindowResizeable(false)
     }
   }
@@ -116,7 +115,6 @@ export default (isComputeHeight) => {
       dom_lyric.value.scrollTop = msDownScrollY + msDownY - y
       startLyricScrollTimeout()
     } else if (winEvent.isMsDown) {
-      // https://github.com/lyswhut/lx-music-desktop/issues/2244
       if (isWin) {
         setWindowBounds({
           x: x - winEvent.msDownX,

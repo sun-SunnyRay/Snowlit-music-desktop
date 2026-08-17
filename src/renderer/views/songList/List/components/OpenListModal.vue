@@ -18,14 +18,7 @@
             <li>{{ $t('songlist__import_input_tip_1') }}</li>
             <li>{{ $t('songlist__import_input_tip_2') }}</li>
             <li>{{ $t('songlist__import_input_tip_3') }}</li>
-            <li>
-              {{ $t('songlist__import_input_tip_4') }}
-              <span
-                class="hover underline"
-                aria-label="https://lyswhut.github.io/lx-music-doc/desktop/faq/cannot-open-songlist"
-                @click="openUrl('https://lyswhut.github.io/lx-music-doc/desktop/faq/cannot-open-songlist')"
-              >FAQ</span>
-            </li>
+            <li>{{ $t('songlist__import_input_tip_4') }}</li>
           </ul>
         </div>
         <base-btn :class="$style.btn" @click="handleSubmit">{{ $t('songlist__import_input_btn_confirm') }}</base-btn>
@@ -39,7 +32,6 @@ import { openSongListInputInfo } from '@renderer/store/songList/state'
 import { setOpenSongListInputInfo } from '@renderer/store/songList/action'
 import { ref, watch } from '@common/utils/vueTools'
 import { useRoute, useRouter } from '@common/utils/vueRouter'
-import { openUrl } from '@common/utils/electron'
 
 const props = defineProps({
   modelValue: Boolean,

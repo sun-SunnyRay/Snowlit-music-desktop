@@ -30,7 +30,7 @@ export const registerKeyEvent = () => {
       if (type == 'up') return
 
       // 软件内快捷键的最小化触发时
-      // 如果已启用托盘，则隐藏程序，否则最小化程序 https://github.com/lyswhut/lx-music-desktop/issues/603
+      // 如果已启用托盘，则隐藏程序，否则最小化程序
       if (window.lx.appHotKeyConfig.local.keys[key].action == HOTKEY_COMMON.min.action && appSetting['tray.enable']) {
         window.key_event.emit(HOTKEY_COMMON.hide_toggle.action)
         return

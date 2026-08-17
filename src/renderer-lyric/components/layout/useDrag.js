@@ -17,7 +17,6 @@ export default () => {
     winEvent.msDownY = y
     winEvent.windowW = window.innerWidth
     winEvent.windowH = window.innerHeight
-    // https://github.com/lyswhut/lx-music-desktop/issues/2244
     if (isWin) setWindowResizeable(false)
   }
   const handleLyricMouseDown = event => {
@@ -39,7 +38,6 @@ export default () => {
 
   const handleMove = (x, y) => {
     if (!winEvent.isMsDown) return
-    // https://github.com/lyswhut/lx-music-desktop/issues/2244
     if (isWin) {
       setWindowBounds({
         x: x - winEvent.msDownX,
