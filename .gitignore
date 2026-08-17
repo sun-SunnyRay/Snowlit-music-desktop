@@ -73,3 +73,7 @@ publish/utils/githubToken.js
 src/**/*-internal.js
 
 .git-upstream/
+
+# Local-only source import notes and helper scripts. Do not publish.
+doc/音源导入链接.md
+scripts/import-*-sources.mjs

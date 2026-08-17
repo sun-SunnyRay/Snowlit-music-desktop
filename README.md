@@ -5,7 +5,7 @@
 - appId：`cn.snowlit.music.desktop`
 - 产物示例：`build/snowlitmusic-desktop-v6.0.27-x64-Setup.exe`
 
-播放要先到「设置 → 自定义源」在线或本地导入音源。仓库不附带推荐源脚本。导入链接见 [doc/音源导入链接.md](doc/音源导入链接.md)。
+播放要先到「设置 → 自定义源」自行在线或本地导入音源。仓库不附带音源脚本，也不附带导入链接清单。
 
 ## 开发
 
