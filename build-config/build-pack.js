@@ -3,6 +3,7 @@
 const builder = require('electron-builder')
 const beforePack = require('./build-before-pack')
 const afterPack = require('./build-after-pack')
+const pkg = require('../package.json')
 
 /**
 * @type {import('electron-builder').Configuration}
@@ -11,6 +12,7 @@ const afterPack = require('./build-after-pack')
 const options = {
   appId: 'cn.snowlit.music.desktop',
   productName: 'snowlitmusic-desktop',
+  buildVersion: String(pkg.versionCode),
   beforePack,
   afterPack,
   protocols: {

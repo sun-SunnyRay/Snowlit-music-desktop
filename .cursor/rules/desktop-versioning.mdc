@@ -1,0 +1,13 @@
+---
+description: Bump versionCode before every desktop pack
+alwaysApply: true
+---
+
+# Desktop pack versioning
+
+Before `npm run pack` or any `pack:win` / `pack:mac` / `pack:linux` ship, run `npm run bump-version` first. Do not pack with the same `version` / `versionCode` as the last pack.
+
+- `versionCode` goes up by one.
+- `version` is always `{floor(code / 10)}.{code % 10}.0`.
+- After the bump, set `VERSIONING.md` current numbers to match `package.json`.
+- Installers under `build/` stay gitignored.

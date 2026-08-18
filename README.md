@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  版本 6.0.27
+  版本 8.7.0
 </p>
 
 映雪音乐在洛雪音乐（LX Music）桌面版之上继续演进：保留检索、播放、歌单与歌词等既有能力，并补足账号歌单同步、歌词点选跳转、设置项收敛，以及独立的映雪品牌与数据目录。本仓库仅发布播放器，不附带音源。
@@ -62,6 +62,6 @@ npm run dev
 npm run pack:win:setup:x64
 ```
 
-安装包生成于 `build/` 目录，例如 `snowlitmusic-desktop-v6.0.27-x64-Setup.exe`。默认关闭自动更新。
+安装包生成于 `build/` 目录，例如 `snowlitmusic-desktop-v8.7.0-x64-Setup.exe`。默认关闭自动更新。
 
 Windows 用户数据位于 `%APPDATA%/snowlitmusic-desktop`。
