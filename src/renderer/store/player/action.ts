@@ -17,6 +17,7 @@ import { getListMusicsFromCache } from '@renderer/store/list/action'
 import { downloadList } from '@renderer/store/download/state'
 import { setProgress } from './playProgress'
 import { playNext } from '@renderer/core/player'
+import { loadPlayingChorus } from '@renderer/core/player/chorus'
 import { LIST_IDS } from '@common/constants'
 import { toRaw } from '@common/utils/vueTools'
 import { arrPush, arrUnshift } from '@common/utils/common'
@@ -136,6 +137,7 @@ export const resetPlayerMusicInfo = () => {
     name: '',
     singer: '',
     album: '',
+    chorusStart: null,
   })
 }
 
@@ -152,6 +154,7 @@ const setPlayerMusicInfo = (musicInfo: LX.Music.MusicInfo | LX.Download.ListItem
       rlrc: null,
       lxlrc: null,
       rawlrc: null,
+      chorusStart: null,
     } : {
       id: musicInfo.id,
       pic: musicInfo.meta.picUrl,
@@ -163,6 +166,7 @@ const setPlayerMusicInfo = (musicInfo: LX.Music.MusicInfo | LX.Download.ListItem
       rlrc: null,
       lxlrc: null,
       rawlrc: null,
+      chorusStart: null,
     })
   } else resetPlayerMusicInfo()
 }
@@ -181,6 +185,7 @@ export const setPlayMusicInfo = (listId: string | null, musicInfo: LX.Download.L
   playMusicInfo.isTempPlay = isTempPlay
 
   setPlayerMusicInfo(musicInfo)
+  if (musicInfo) loadPlayingChorus(musicInfo)
 
   setProgress(0, 0)
 

@@ -9,6 +9,8 @@
             :progress="progress"
             :handle-transition-end="handleTransitionEnd"
             :is-active-transition="isActiveTransition"
+            :chorus-at="chorusAt"
+            :chorus-start="chorusStart"
           />
         </div>
       </div>
@@ -41,6 +43,7 @@
 import { playNext, playPrev, togglePlay } from '@renderer/core/player'
 import { status, isPlay } from '@renderer/store/player/state'
 import usePlayProgress from '@renderer/utils/compositions/usePlayProgress'
+import useChorusAt from '@renderer/utils/compositions/useChorusAt'
 
 import ControlBtns from './components/ControlBtns.vue'
 
@@ -51,6 +54,7 @@ const {
   isActiveTransition,
   handleTransitionEnd,
 } = usePlayProgress()
+const { chorusAt, chorusStart } = useChorusAt()
 
 </script>
 
@@ -59,7 +63,7 @@ const {
 
 .footer {
   flex: 0 0 100px;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   align-items: center;
 }
@@ -68,7 +72,7 @@ const {
   display: flex;
   flex-flow: column nowrap;
   padding: 13px 13px 13px 30px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .progressContainer {

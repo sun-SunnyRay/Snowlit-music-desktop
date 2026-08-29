@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.player">
     <div :class="$style.progress">
-      <common-progress-bar v-if="!isShowPlayerDetail" :class-name="$style.progressBar" :progress="progress" :handle-transition-end="handleTransitionEnd" :is-active-transition="isActiveTransition" />
+      <common-progress-bar v-if="!isShowPlayerDetail" :class-name="$style.progressBar" :progress="progress" :handle-transition-end="handleTransitionEnd" :is-active-transition="isActiveTransition" :chorus-at="chorusAt" :chorus-start="chorusStart" />
     </div>
     <div :class="$style.picContent" :aria-label="$t('player__pic_tip')" @contextmenu="handleToMusicLocation" @click="showPlayerDetail">
       <img v-if="musicInfo.pic" :src="musicInfo.pic" decoding="async" @error="imgError">
@@ -50,6 +50,7 @@ import { clipboardWriteText } from '@common/utils/electron'
 import ControlBtns from './ControlBtns.vue'
 // import PlayProgress from './PlayProgress'
 import usePlayProgress from '@renderer/utils/compositions/usePlayProgress'
+import useChorusAt from '@renderer/utils/compositions/useChorusAt'
 // import { lyric } from '@renderer/core/share/lyric'
 import {
   statusText,
@@ -84,6 +85,7 @@ export default {
       isActiveTransition,
       handleTransitionEnd,
     } = usePlayProgress()
+    const { chorusAt, chorusStart } = useChorusAt()
 
     const showPlayerDetail = () => {
       if (!playMusicInfo.musicInfo) return
@@ -139,6 +141,8 @@ export default {
       playPrev,
       handleToMusicLocation,
       isShowPlayerDetail,
+      chorusAt,
+      chorusStart,
     }
   },
 }
@@ -156,7 +160,7 @@ export default {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  contain: strict;
+  contain: layout style;
   padding: 8px 6px 6px;
   z-index: 2;
   // box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);

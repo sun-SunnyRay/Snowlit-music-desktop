@@ -1,7 +1,18 @@
 <template>
   <div :class="[$style.progress, className]">
-    <div :class="[$style.progressBar, $style.progressBar2, {[$style.barTransition]: isActiveTransition}]" :style="{ transform: `scaleX(${progress || 0})` }" @transitionend="handleTransitionEnd" />
-    <div v-show="dragging" :class="[$style.progressBar, $style.progressBar3]" :style="{ transform: `scaleX(${dragProgress || 0})` }" />
+    <div :class="$style.progressFill">
+      <div :class="[$style.progressBar, $style.progressBar2, {[$style.barTransition]: isActiveTransition}]" :style="{ transform: `scaleX(${progress || 0})` }" @transitionend="handleTransitionEnd" />
+      <div v-show="dragging" :class="[$style.progressBar, $style.progressBar3]" :style="{ transform: `scaleX(${dragProgress || 0})` }" />
+    </div>
+    <button
+      v-if="chorusAt != null && chorusStart != null"
+      type="button"
+      :class="$style.chorusHit"
+      :style="{ left: `${chorusAt * 100}%` }"
+      @mousedown.stop.prevent="handleChorusSeek"
+    >
+      <span :class="$style.chorusDot" />
+    </button>
   </div>
   <div ref="dom_progress" :class="$style.progressMask" @mousedown="handleMsDown" />
 </template>
@@ -27,6 +38,14 @@ export default {
     handleTransitionEnd: {
       type: Function,
       required: true,
+    },
+    chorusAt: {
+      type: Number,
+      default: null,
+    },
+    chorusStart: {
+      type: Number,
+      default: null,
     },
   },
   setup(props) {
@@ -74,6 +93,10 @@ export default {
     const setProgress = num => {
       window.app_event.setProgress(num)
     }
+    const handleChorusSeek = () => {
+      if (props.chorusStart == null) return
+      setProgress(props.chorusStart)
+    }
 
     // const handleSetProgress = event => {
     //   // setProgress(event.offsetX / dom_progress.value.clientWidth * playProgress.maxPlayTime)
@@ -85,6 +108,7 @@ export default {
       dragging,
       dragProgress,
       handleMsDown,
+      handleChorusSeek,
     }
   },
 }
@@ -96,13 +120,22 @@ export default {
 .progress {
   width: 100%;
   height: 5px;
-  overflow: hidden;
+  overflow: visible;
   transition: @transition-normal;
   transition-property: background-color;
   background-color: var(--color-primary-light-100-alpha-800);
   // background-color: #f5f5f5;
   position: relative;
   border-radius: 40px;
+}
+.progressFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
 }
 .progressMask {
   position: absolute;
@@ -139,6 +172,30 @@ export default {
   transition-property: transform;
   transition-timing-function: ease-out;
   transition-duration: 0.2s;
+}
+
+.chorusHit {
+  position: absolute;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  margin-top: -14px;
+  z-index: 8;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chorusDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--color-primary-light-100);
+  pointer-events: none;
 }
 
 </style>

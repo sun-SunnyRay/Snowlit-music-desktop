@@ -158,7 +158,7 @@ export default {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  contain: strict;
+  contain: layout style;
   padding: 6px;
   z-index: 2;
   // box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);

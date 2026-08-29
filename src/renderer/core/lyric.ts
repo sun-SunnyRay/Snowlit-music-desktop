@@ -6,6 +6,7 @@ import { setStatusText } from '@renderer/store/player/action'
 import { markRawList } from '@common/utils/vueTools'
 import { appSetting } from '@renderer/store/setting'
 import { onNewDesktopLyricProcess } from '@renderer/utils/ipc'
+import { ensureEvenSplitLxlrc } from '@renderer/core/player/karaokeLyric'
 
 const getCurrentTime = () => {
   return getPlayerCurrentTime() * 1000
@@ -164,10 +165,8 @@ export const setLyric = () => {
     if (appSetting['player.isShowLyricTranslation'] && musicInfo.tlrc) extendedLyrics.push(musicInfo.tlrc)
     if (appSetting['player.isSwapLyricTranslationAndRoma']) extendedLyrics.reverse()
 
-    lrc.setLyric(
-      appSetting['player.isPlayLxlrc'] && musicInfo.lxlrc ? musicInfo.lxlrc : musicInfo.lrc,
-      extendedLyrics,
-    )
+    const raw = appSetting['player.isPlayLxlrc'] && musicInfo.lxlrc ? musicInfo.lxlrc : musicInfo.lrc
+    lrc.setLyric(ensureEvenSplitLxlrc(raw ?? ''), extendedLyrics)
     sendDesktopLyricInfo({
       action: 'set_lyric',
       data: {

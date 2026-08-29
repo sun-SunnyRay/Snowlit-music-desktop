@@ -9,7 +9,7 @@
       </div>
       <base-popup v-model:visible="visible" :btn-el="dom_btn" @mouseenter="handlMsEnter" @mouseleave="handlMsLeave" @transitionend="handleTranEnd">
         <div :class="$style.popupProgress">
-          <common-progress-bar v-if="visibleProgress" :progress="progress" :handle-transition-end="handleTransitionEnd" :is-active-transition="isActiveTransition" />
+          <common-progress-bar v-if="visibleProgress" :progress="progress" :handle-transition-end="handleTransitionEnd" :is-active-transition="isActiveTransition" :chorus-at="chorusAt" :chorus-start="chorusStart" />
         </div>
       </base-popup>
     </div>
@@ -19,6 +19,7 @@
 <script>
 import { ref } from '@common/utils/vueTools'
 import usePlayProgress from '@renderer/utils/compositions/usePlayProgress'
+import useChorusAt from '@renderer/utils/compositions/useChorusAt'
 import { isShowPlayerDetail } from '@renderer/store/player/state'
 
 export default {
@@ -40,6 +41,7 @@ export default {
       isActiveTransition,
       handleTransitionEnd,
     } = usePlayProgress()
+    const { chorusAt, chorusStart } = useChorusAt()
 
     let timeout = null
     const handlMsEnter = () => {
@@ -90,6 +92,8 @@ export default {
       handlMsEnter,
       handleTranEnd,
       isShowPlayerDetail,
+      chorusAt,
+      chorusStart,
     }
   },
 }
