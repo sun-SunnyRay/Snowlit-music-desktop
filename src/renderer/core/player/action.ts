@@ -17,8 +17,9 @@ import { getMusicUrl, getPicPath, getLyricInfo } from '../music/index'
 import { filterList } from './utils'
 import { requestMsg } from '@renderer/utils/message'
 import { getRandom } from '@renderer/utils/index'
-import { addListMusics, removeListMusics } from '@renderer/store/list/action'
+import { addListMusics, getListMusics, removeListMusics } from '@renderer/store/list/action'
 import { loveList } from '@renderer/store/list/state'
+import { loveIdsForTrack, playingListMusic } from '@common/loveTrack'
 import { addDislikeInfo } from '@renderer/core/dislikeList'
 // import { checkMusicFileAvailable } from '@renderer/utils/music'
 
@@ -623,16 +624,22 @@ export const togglePlay = () => {
  * 收藏当前播放的歌曲
  */
 export const collectMusic = () => {
-  if (!playMusicInfo.musicInfo) return
-  void addListMusics(loveList.id, ['progress' in playMusicInfo.musicInfo ? playMusicInfo.musicInfo.metadata.musicInfo : playMusicInfo.musicInfo])
+  const music = playingListMusic(playMusicInfo.musicInfo)
+  if (!music) return
+  void addListMusics(loveList.id, [music])
 }
 
 /**
  * 取消收藏当前播放的歌曲
  */
 export const uncollectMusic = () => {
-  if (!playMusicInfo.musicInfo) return
-  void removeListMusics({ listId: loveList.id, ids: ['progress' in playMusicInfo.musicInfo ? playMusicInfo.musicInfo.metadata.musicInfo.id : playMusicInfo.musicInfo.id] })
+  const music = playingListMusic(playMusicInfo.musicInfo)
+  if (!music) return
+  void getListMusics(loveList.id).then(list => {
+    const ids = loveIdsForTrack(list, music)
+    if (!ids.length) return
+    void removeListMusics({ listId: loveList.id, ids })
+  })
 }
 
 /**

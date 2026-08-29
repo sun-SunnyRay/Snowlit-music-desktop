@@ -1,4 +1,5 @@
 import { LIST_IDS } from '@common/constants'
+import { collapseLoveList, upsertLoveInto } from '@common/loveTrack'
 import { arrPush, arrPushByPosition, arrUnshift } from '@common/utils/common'
 import {
   deleteUserLists,
@@ -196,6 +197,11 @@ export const musicOverwrite = (listId: string, musicInfos: LX.Music.MusicInfo[])
 export const musicsAdd = (listId: string, musicInfos: LX.Music.MusicInfo[], addMusicLocationType: LX.AddMusicLocationType) => {
   let targetList = getListMusics(listId)
 
+  if (listId == LIST_IDS.LOVE) {
+    musicOverwrite(listId, upsertLoveInto(targetList, musicInfos, addMusicLocationType))
+    return
+  }
+
   const set = new Set<string>()
   for (const item of targetList) set.add(item.id)
   musicInfos = musicInfos.filter(item => {
@@ -242,6 +248,17 @@ export const musicsMove = (fromId: string, toId: string, musicInfos: LX.Music.Mu
   let toList = getListMusics(toId)
 
   const ids = musicInfos.map(musicInfo => musicInfo.id)
+
+  if (toId == LIST_IDS.LOVE) {
+    const next = upsertLoveInto(toList, musicInfos, addMusicLocationType)
+    if (fromId != toId) {
+      removeMusicInfos(fromId, ids)
+      const idsSet = new Set<string>(ids)
+      musicLists.set(fromId, fromList.filter(mInfo => !idsSet.has(mInfo.id)))
+    }
+    musicOverwrite(toId, next)
+    return
+  }
 
   let listSet = new Set<string>()
   for (const item of toList) listSet.add(item.id)
@@ -343,6 +360,7 @@ export const musicsPositionUpdate = (listId: string, position: number, ids: stri
  * @param myListData 完整列表数据
  */
 export const listDataOverwrite = (myListData: MakeOptional<LX.List.ListDataFull, 'tempList'>) => {
+  myListData.loveList = collapseLoveList(myListData.loveList)
   const dbLists: LX.DBService.UserListInfo[] = []
   const listData: LX.List.ListDataFull = {
     ...myListData,

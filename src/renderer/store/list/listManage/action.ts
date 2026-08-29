@@ -8,6 +8,7 @@ import {
 } from './state'
 import { overwriteListPosition, overwriteListUpdateInfo, removeListPosition, removeListUpdateInfo } from '@renderer/utils/data'
 import { LIST_IDS } from '@common/constants'
+import { upsertLoveInto } from '@common/loveTrack'
 import { arrPush, arrUnshift } from '@common/utils/common'
 
 export const setUserLists = (lists: LX.List.UserListInfo[]) => {
@@ -224,6 +225,14 @@ export const listMusicClear = (ids: string[]): string[] => {
 export const listMusicAdd = (id: string, musicInfos: LX.Music.MusicInfo[], addMusicLocationType: LX.AddMusicLocationType): string[] => {
   const targetList = allMusicList.get(id)
   if (!targetList) return id == loveList.id ? [id] : []
+
+  if (id == loveList.id) {
+    const next = upsertLoveInto(targetList, musicInfos, addMusicLocationType)
+    for (const item of next) markRaw(item)
+    targetList.splice(0, targetList.length)
+    arrPush(targetList, next)
+    return [id]
+  }
 
   const listSet = new Set<string>()
   for (const item of targetList) listSet.add(item.id)

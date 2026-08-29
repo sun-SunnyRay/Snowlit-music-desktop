@@ -20,7 +20,8 @@
 // import { mapMutations } from 'vuex'
 import { watch, ref, onBeforeUnmount } from '@common/utils/vueTools'
 import { defaultList, loveList, userLists } from '@renderer/store/list/state'
-import { addListMusics, moveListMusics, createUserList, getMusicExistListIds } from '@renderer/store/list/action'
+import { addListMusics, moveListMusics, createUserList, getListMusics, getMusicExistListIds } from '@renderer/store/list/action'
+import { isLovedMusic } from '@common/loveTrack'
 import useKeyDown from '@renderer/utils/compositions/useKeyDown'
 import { useI18n } from '@root/lang'
 import { dialog } from '@renderer/plugins/Dialog'
@@ -72,8 +73,12 @@ export default {
 
     const checkMusicExist = (musicInfo) => {
       const mid = musicInfo.id
-      void getMusicExistListIds(mid).then(ids => {
+      void Promise.all([
+        getMusicExistListIds(mid),
+        getListMusics(loveList.id),
+      ]).then(([ids, love]) => {
         if (mid != musicInfo.id) return
+        if (isLovedMusic(love, musicInfo) && !ids.includes(loveList.id)) ids.push(loveList.id)
         for (const list of lists.value) {
           if (ids.includes(list.id)) list.isExist = true
         }

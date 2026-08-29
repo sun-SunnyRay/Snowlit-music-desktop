@@ -8,9 +8,11 @@ import {
   addListMusics as addListMusicsAction,
   moveListMusics as moveListMusicsAction,
   overwriteListMusics,
+  getListMusics,
 } from '@renderer/store/list/listManage'
 import { toRaw } from '@common/utils/vueTools'
 import { LIST_IDS } from '@common/constants'
+import { collapseLoveList, loveListUnchanged } from '@common/loveTrack'
 
 export const registerAction = (onListChanged: (listIds: string[]) => void) => {
   return registerListAction(appSetting, onListChanged)
@@ -75,6 +77,17 @@ export const createUserList = async({ name, id = `userlist_${Date.now()}`, list 
   if (list) await addListMusics(id, list)
 }
 
+
+export const collapseStoredLoveList = async() => {
+  const list = await getListMusics(LIST_IDS.LOVE)
+  if (!list.length) return
+  const next = collapseLoveList(list)
+  if (loveListUnchanged(list, next)) return
+  await overwriteListMusics({
+    listId: LIST_IDS.LOVE,
+    musicInfos: next,
+  })
+}
 
 export const setTempList = async(id: string, list: LX.Music.MusicInfoOnline[]) => {
   tempListMeta.id = id

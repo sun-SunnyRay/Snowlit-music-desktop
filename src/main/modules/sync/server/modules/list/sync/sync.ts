@@ -3,6 +3,7 @@ import { removeSelectModeListener, sendCloseSelectMode, sendSelectMode } from '@
 import { getUserSpace, getUserConfig } from '../../../user'
 import { buildUserListInfoFull, getLocalListData, setLocalListData } from '@main/modules/sync/listEvent'
 import { SYNC_CLOSE_CODE } from '@common/constants_sync'
+import { collapseLoveList } from '@common/loveTrack'
 // import { LIST_IDS } from '@common/constants'
 
 // type ListInfoType = LX.List.UserListInfoFull | LX.List.MyDefaultListInfoFull | LX.List.MyLoveListInfoFull
@@ -141,7 +142,7 @@ const mergeList = (socket: LX.Sync.Server.Socket, sourceListData: LX.Sync.List.L
     userList: [],
   }
   newListData.defaultList = handleMergeList(sourceListData.defaultList, targetListData.defaultList, addMusicLocationType)
-  newListData.loveList = handleMergeList(sourceListData.loveList, targetListData.loveList, addMusicLocationType)
+  newListData.loveList = collapseLoveList(handleMergeList(sourceListData.loveList, targetListData.loveList, addMusicLocationType))
 
   const userListDataObj = createUserListDataObj(sourceListData)
   newListData.userList = [...sourceListData.userList]
@@ -333,7 +334,7 @@ const handleMergeListDataFromSnapshot = async(socket: LX.Sync.Server.Socket, sna
     userList: [],
   }
   newListData.defaultList = mergeListDataFromSnapshot(localListData.defaultList, remoteListData.defaultList, snapshot.defaultList, addMusicLocationType)
-  newListData.loveList = mergeListDataFromSnapshot(localListData.loveList, remoteListData.loveList, snapshot.loveList, addMusicLocationType)
+  newListData.loveList = collapseLoveList(mergeListDataFromSnapshot(localListData.loveList, remoteListData.loveList, snapshot.loveList, addMusicLocationType))
   const localUserListData = createUserListDataObj(localListData)
   const remoteUserListData = createUserListDataObj(remoteListData)
   const snapshotUserListData = createUserListDataObj(snapshot)

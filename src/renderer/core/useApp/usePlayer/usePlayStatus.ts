@@ -3,8 +3,9 @@ import { sendPlayerStatus, onPlayerAction } from '@renderer/utils/ipc'
 // import store from '@renderer/store'
 
 import { loveList } from '@renderer/store/list/state'
-import { addListMusics, removeListMusics, checkListExistMusic } from '@renderer/store/list/action'
+import { addListMusics, getListMusics, removeListMusics } from '@renderer/store/list/action'
 import { playMusicInfo, musicInfo } from '@renderer/store/player/state'
+import { isLovedMusic, loveIdsForTrack, playingListMusic } from '@common/loveTrack'
 import { throttle } from '@common/utils'
 import { pause, play, playNext, playPrev } from '@renderer/core/player'
 import { playProgress } from '@renderer/store/player/playProgress'
@@ -17,7 +18,12 @@ export default () => {
   let collect = false
 
   const updateCollectStatus = async() => {
-    let status = !!playMusicInfo.musicInfo && await checkListExistMusic(loveList.id, playMusicInfo.musicInfo.id)
+    const music = playingListMusic(playMusicInfo.musicInfo)
+    let status = false
+    if (music) {
+      const list = await getListMusics(loveList.id)
+      status = isLovedMusic(list, music)
+    }
     if (collect == status) return false
     collect = status
     return true
@@ -98,16 +104,22 @@ export default () => {
       case 'next':
         void playNext()
         break
-      case 'collect':
-        if (!playMusicInfo.musicInfo) return
-        void addListMusics(loveList.id, ['progress' in playMusicInfo.musicInfo ? playMusicInfo.musicInfo.metadata.musicInfo : playMusicInfo.musicInfo])
+      case 'collect': {
+        const music = playingListMusic(playMusicInfo.musicInfo)
+        if (!music) return
+        void addListMusics(loveList.id, [music])
         if (await updateCollectStatus()) sendPlayerStatus({ collect })
         break
-      case 'unCollect':
-        if (!playMusicInfo.musicInfo) return
-        void removeListMusics({ listId: loveList.id, ids: ['progress' in playMusicInfo.musicInfo ? playMusicInfo.musicInfo.metadata.musicInfo.id : playMusicInfo.musicInfo.id] })
+      }
+      case 'unCollect': {
+        const music = playingListMusic(playMusicInfo.musicInfo)
+        if (!music) return
+        const list = await getListMusics(loveList.id)
+        const ids = loveIdsForTrack(list, music)
+        if (ids.length) void removeListMusics({ listId: loveList.id, ids })
         if (await updateCollectStatus()) sendPlayerStatus({ collect })
         break
+      }
       case 'seek': {
         let progress = data as number
         if (progress < 0) progress = 0

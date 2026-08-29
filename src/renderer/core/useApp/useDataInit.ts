@@ -1,7 +1,7 @@
 import { getPlayInfo } from '@renderer/utils/ipc'
 import music from '@renderer/utils/musicSdk'
 import { log } from '@common/utils'
-import { getListMusics, getUserLists, registerAction } from '@renderer/store/list/action'
+import { collapseStoredLoveList, getListMusics, getUserLists, registerAction } from '@renderer/store/list/action'
 
 
 import useInitUserApi from './useInitUserApi'
@@ -52,6 +52,7 @@ export default () => {
       window.app_event.myListUpdate(ids)
     })
     window.lxData.userLists = await getUserLists() // 获取用户列表
+    await collapseStoredLoveList()
     await ensureAccountPlaylists().catch(err => {
       log.error(err)
     })
