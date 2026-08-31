@@ -3,6 +3,7 @@ import {
   allMusicList,
   defaultList,
   loveList,
+  recentList,
   tempList,
   userLists,
 } from './state'
@@ -75,6 +76,7 @@ const updateList = ({
   switch (id) {
     case defaultList.id:
     case loveList.id:
+    case recentList.id:
       break
     case tempList.id:
       tempList.meta = meta ?? {}
@@ -208,7 +210,7 @@ export const userListsUpdatePosition = (position: number, ids: string[]) => {
 export const listMusicOverwrite = (listId: string, musicInfos: LX.Music.MusicInfo[]): string[] => {
   const isExist = allMusicList.has(listId)
   overwriteMusicList(listId, musicInfos)
-  return isExist || listId == loveList.id ? [listId] : []
+  return isExist || listId == loveList.id || listId == defaultList.id || listId == recentList.id ? [listId] : []
 }
 
 export const listMusicClear = (ids: string[]): string[] => {

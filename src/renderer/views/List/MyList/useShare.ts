@@ -3,7 +3,7 @@ import { openSaveDir, showSelectDialog } from '@renderer/utils/ipc'
 import { useI18n } from '@renderer/plugins/i18n'
 import { filterFileName, toNewMusicInfo, fixNewMusicInfoQuality, filterMusicList } from '@renderer/utils'
 import { getListMusics, updateUserList, addListMusics, overwriteListMusics, createUserList } from '@renderer/store/list/action'
-import { defaultList, loveList, userLists } from '@renderer/store/list/state'
+import { defaultList, loveList, recentList, userLists } from '@renderer/store/list/state'
 import useImportTip from '@renderer/utils/compositions/useImportTip'
 import { dialog } from '@renderer/plugins/Dialog'
 
@@ -58,7 +58,7 @@ export default () => {
           return
       }
 
-      const targetList = [defaultList, loveList, ...userLists].find(l => l.id == listData.id)
+      const targetList = [defaultList, loveList, recentList, ...userLists].find(l => l.id == listData.id)
       if (targetList) {
         const confirm = await dialog.confirm({
           message: t('lists__import_part_confirm', { importName: listData.name, localName: targetList.name }),
@@ -70,6 +70,7 @@ export default () => {
           switch (listData.id) {
             case defaultList.id:
             case loveList.id:
+            case recentList.id:
               break
             default:
               void updateUserList([

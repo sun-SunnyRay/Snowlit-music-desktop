@@ -17,7 +17,7 @@ export default ({ dom_lists_list, handleSaveListName, handleMenuClick }: {
     dragingItemClassName: styles.dragingItem,
     filter: 'default-list',
     onUpdate(newIndex: number, oldIndex: number) {
-      void updateUserListPosition({ ids: [userLists[oldIndex - 2].id], position: newIndex - 2 })
+      void updateUserListPosition({ ids: [userLists[oldIndex - 3].id], position: newIndex - 3 })
     },
   })
 

@@ -11,6 +11,9 @@ import { appSetting } from '@renderer/store/setting'
 import { playMusicInfo } from '@renderer/store/player/state'
 import { initDislikeInfo, registerRemoteDislikeAction } from '@renderer/core/dislikeList'
 import { ensureAccountPlaylists } from '@renderer/store/sourceAccount'
+import { loadSnowlitSession } from '@renderer/store/snowlitAccount'
+import { onSnowlitLocalListsChanged, syncSnowlitLists } from '@renderer/core/snowlitListSync'
+import { initListenRecent } from '@renderer/core/listenRecent'
 
 const initPrevPlayInfo = async() => {
   const info = await getPlayInfo()
@@ -50,10 +53,18 @@ export default () => {
     void music.init() // 初始化音乐sdk
     unregister = registerAction((ids) => {
       window.app_event.myListUpdate(ids)
+      onSnowlitLocalListsChanged(ids)
     })
     window.lxData.userLists = await getUserLists() // 获取用户列表
     await collapseStoredLoveList()
+    initListenRecent()
     await ensureAccountPlaylists().catch(err => {
+      log.error(err)
+    })
+    await loadSnowlitSession().catch(err => {
+      log.error(err)
+    })
+    void syncSnowlitLists().catch(err => {
       log.error(err)
     })
     unregisterDislikeEvent = registerRemoteDislikeAction()

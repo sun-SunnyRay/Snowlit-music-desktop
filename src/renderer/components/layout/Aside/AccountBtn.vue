@@ -21,6 +21,7 @@
 import { computed, ref } from '@common/utils/vueTools'
 import { useIconSize } from '@renderer/utils/compositions/useIconSize'
 import { accountAutoState } from '@renderer/store/sourceAccount'
+import { snowlitAccountState } from '@renderer/store/snowlitAccount'
 
 defineProps({
   active: { type: Boolean, default: false },
@@ -29,7 +30,7 @@ const emit = defineEmits(['open'])
 
 const dom_btn = ref()
 const iconSize = useIconSize(dom_btn, 0.32)
-const loggedIn = computed(() => accountAutoState.loggedIn.length > 0)
+const loggedIn = computed(() => accountAutoState.loggedIn.length > 0 || !!snowlitAccountState.session)
 </script>
 
 <style lang="less" module>

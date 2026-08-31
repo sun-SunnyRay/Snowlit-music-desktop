@@ -4,6 +4,7 @@ export {
   allMusicList,
   defaultList,
   loveList,
+  recentList,
   tempList,
   userLists,
 } from '@renderer/store/list/listManage'

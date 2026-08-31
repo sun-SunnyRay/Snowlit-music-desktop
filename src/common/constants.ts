@@ -28,6 +28,7 @@ export const LIST_IDS = {
   LOVE: 'love',
   TEMP: 'temp',
   DOWNLOAD: 'download',
+  RECENT: 'recent',
   PLAY_LATER: null,
   ACCOUNT_DAILY: 'account__daily',
   ACCOUNT_RECENT: 'account__recent',
@@ -48,6 +49,9 @@ export const DATA_KEYS = {
 
   lastStartInfo: 'lastStartInfo',
   accountAutoSource: 'accountAutoSource',
+  snowlitAccount: 'snowlitAccount',
+  snowlitListChoice: 'snowlitListChoice',
+  snowlitListTimes: 'snowlitListTimes',
 } as const
 
 export const DEFAULT_SETTING = {

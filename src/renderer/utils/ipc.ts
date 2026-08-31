@@ -212,6 +212,39 @@ export const getAccountAutoSource = async() => {
   return rendererInvoke<string, LX.SourceAccount.Id | null>(WIN_MAIN_RENDERER_EVENT_NAME.get_data, DATA_KEYS.accountAutoSource)
 }
 
+export const getSnowlitAccount = async() => {
+  return rendererInvoke<string, { token: string, userId: string, email: string } | null>(WIN_MAIN_RENDERER_EVENT_NAME.get_data, DATA_KEYS.snowlitAccount)
+}
+
+export const saveSnowlitAccount = (session: { token: string, userId: string, email: string } | null) => {
+  rendererSend(WIN_MAIN_RENDERER_EVENT_NAME.save_data, {
+    path: DATA_KEYS.snowlitAccount,
+    data: session,
+  })
+}
+
+export const getSnowlitListChoice = async() => {
+  return rendererInvoke<string, Record<string, 'cloud' | 'local' | 'merge'> | null>(WIN_MAIN_RENDERER_EVENT_NAME.get_data, DATA_KEYS.snowlitListChoice)
+}
+
+export const saveSnowlitListChoice = (map: Record<string, 'cloud' | 'local' | 'merge'>) => {
+  rendererSend(WIN_MAIN_RENDERER_EVENT_NAME.save_data, {
+    path: DATA_KEYS.snowlitListChoice,
+    data: map,
+  })
+}
+
+export const getSnowlitListTimes = async() => {
+  return rendererInvoke<string, Record<string, number> | null>(WIN_MAIN_RENDERER_EVENT_NAME.get_data, DATA_KEYS.snowlitListTimes)
+}
+
+export const saveSnowlitListTimes = (map: Record<string, number>) => {
+  rendererSend(WIN_MAIN_RENDERER_EVENT_NAME.save_data, {
+    path: DATA_KEYS.snowlitListTimes,
+    data: map,
+  })
+}
+
 export const saveLastStartInfo = (version: string) => {
   rendererSend(WIN_MAIN_RENDERER_EVENT_NAME.save_data, {
     path: DATA_KEYS.lastStartInfo,
