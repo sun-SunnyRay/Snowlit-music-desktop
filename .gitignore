@@ -77,3 +77,10 @@ src/**/*-internal.js
 # Local-only source import notes and helper scripts. Do not publish.
 doc/音源导入链接.md
 scripts/import-*-sources.mjs
+src/common/source-internal/
+**/assets/sources/
+
+# Local server endpoints and tokens. Do not publish.
+**/config.local.ts
+**/*.env
+/server/

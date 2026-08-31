@@ -1,4 +1,15 @@
-export const SNOWLIT_ACCOUNT_ORIGIN = 'http://140.143.151.36:8001'
+const loadLocalOrigin = () => {
+  try {
+    // Local file is gitignored. Missing on a clean clone.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const local = require('./config.local') as { SNOWLIT_ACCOUNT_ORIGIN?: string }
+    return String(local.SNOWLIT_ACCOUNT_ORIGIN || '')
+  } catch {
+    return ''
+  }
+}
+
+export const SNOWLIT_ACCOUNT_ORIGIN = loadLocalOrigin()
 export const SNOWLIT_OTP_ORIGIN = SNOWLIT_ACCOUNT_ORIGIN
 
 export const SNOWLIT_OTP_SEND_PATH = '/v1/otp/send'
