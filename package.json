@@ -1,7 +1,7 @@
 {
   "name": "snowlitmusic-desktop",
-  "version": "9.4.0",
-  "versionCode": 94,
+  "version": "9.7.0",
+  "versionCode": 97,
   "description": "Snowlit Music desktop",
   "main": "./dist/main.js",
   "scripts": {
