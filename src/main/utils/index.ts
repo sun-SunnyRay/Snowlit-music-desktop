@@ -3,6 +3,7 @@ import migrateSetting from '@common/utils/migrateSetting'
 import getStore from '@main/utils/store'
 import { STORE_NAMES, URL_SCHEME_RXP } from '@common/constants'
 import defaultSetting from '@common/defaultSetting'
+import { DEFAULT_PACKAGED_SOURCE_ID, shouldDefaultApiSource } from '@common/packagedSources'
 import defaultHotKey from '@common/defaultHotKey'
 import { migrateDataJson, migrateHotKey, migrateUserApi, parseDataFile } from './migrate'
 import { nativeTheme, powerSaveBlocker } from 'electron'
@@ -116,8 +117,9 @@ const applyInitSetting = (setting: LX.AppSetting) => {
   setting['common.showChangeLog'] = false
   setting['network.proxy.enable'] = false
   const apiSource = String(setting['common.apiSource'] || '')
-  if (!apiSource || apiSource == 'temp' || apiSource == 'kw' || apiSource.startsWith('builtin_') || apiSource == 'user_api_hyw') {
-    setting['common.apiSource'] = 'user_api_xinghai'
+  const storedApis = (getStore(STORE_NAMES.USER_API).get('userApis') as Array<{ id: string, name?: string }> | undefined) || []
+  if (shouldDefaultApiSource(apiSource, storedApis)) {
+    setting['common.apiSource'] = DEFAULT_PACKAGED_SOURCE_ID
   }
 }
 

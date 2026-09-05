@@ -2,7 +2,8 @@ import { userApis as defaultUserApis } from './config'
 import { STORE_NAMES } from '@common/constants'
 import getStore from '@main/utils/store'
 import zlib from 'node:zlib'
-import { DROPPED_PACKAGED_IDS, PACKAGED_IDS, getPackagedApiInfos, loadPackagedScript } from './packagedSources'
+import { PACKAGED_IDS, getPackagedApiInfos, loadPackagedScript } from './packagedSources'
+import { isReplacedImportedSource } from '@common/packagedSources'
 
 let userApis: LX.UserApi.UserApiInfo[] | null
 let scripts = new Map<string, string>()
@@ -16,7 +17,7 @@ const saveData = () => {
   }))
 }
 
-const isStoredUserApi = (id: string) => !PACKAGED_IDS.has(id) && !DROPPED_PACKAGED_IDS.has(id)
+const isStoredUserApi = (api: { id: string, name?: string }) => !isReplacedImportedSource(api)
 
 const withPackaged = (list: LX.UserApi.UserApiInfo[]) => [...getPackagedApiInfos(), ...list]
 
@@ -29,7 +30,7 @@ export const getUserApis = (): LX.UserApi.UserApiInfo[] => {
   if (infoFull) {
     for (let i = 0; i < infoFull.length; i++) {
       const api = infoFull[i]
-      if (!isStoredUserApi(api.id)) {
+      if (!isStoredUserApi(api)) {
         infoFull.splice(i, 1)
         i--
         requiredUpdate = true
@@ -57,7 +58,7 @@ export const getUserApis = (): LX.UserApi.UserApiInfo[] => {
     const { script, ...info } = api
     scripts.set(api.id, script)
     return info
-  }).filter(api => isStoredUserApi(api.id))
+  }).filter(api => isStoredUserApi(api))
   if (requiredUpdate) saveData()
   return withPackaged(userApis)
 }
@@ -142,7 +143,7 @@ export const importApi = async(scriptRaw: string): Promise<LX.UserApi.UserApiInf
 
 export const removeApi = (ids: string[]) => {
   if (!userApis) return
-  const removable = ids.filter(id => isStoredUserApi(id))
+  const removable = ids.filter(id => isStoredUserApi({ id }))
   for (let index = userApis.length - 1; index > -1; index--) {
     if (removable.includes(userApis[index].id)) {
       scripts.delete(userApis[index].id)

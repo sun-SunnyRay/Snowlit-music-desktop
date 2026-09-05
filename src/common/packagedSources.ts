@@ -44,6 +44,25 @@ export const DROPPED_PACKAGED_IDS = new Set(['user_api_hyw'])
 
 export const DEFAULT_PACKAGED_SOURCE_ID = 'user_api_xinghai'
 
+const replacedName = (name: string) => {
+  if (!name) return false
+  if (/公益测试|HYWmusic/i.test(name)) return true
+  return PACKAGED_SOURCES.some(source => name == source.name || name.includes(source.name) || source.name.includes(name))
+}
+
+export const isReplacedImportedSource = (api: { id?: string, name?: string }) => {
+  if (api.id && (PACKAGED_IDS.has(api.id) || DROPPED_PACKAGED_IDS.has(api.id))) return true
+  return replacedName(String(api.name || ''))
+}
+
+export const shouldDefaultApiSource = (id: string, stored: Array<{ id: string, name?: string }> = []) => {
+  if (!id || id == 'temp' || id == 'kw' || id.startsWith('builtin_') || DROPPED_PACKAGED_IDS.has(id)) return true
+  if (PACKAGED_IDS.has(id)) return false
+  const selected = stored.find(api => api.id == id)
+  if (selected) return isReplacedImportedSource(selected)
+  return id.startsWith('user_api_')
+}
+
 export const toUserApiInfo = (source: PackagedSourceInfo): LX.UserApi.UserApiInfo => ({
   id: source.id,
   name: source.name,
