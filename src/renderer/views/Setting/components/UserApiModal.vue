@@ -12,7 +12,7 @@ material-modal(:show="modelValue" bg-close teleport="#view" @close="handleClose"
           p {{ api.description }}
           div
             base-checkbox(:id="`user_api_${api.id}`" v-model="api.allowShowUpdateAlert" :class="$style.checkbox" :label="$t('user_api__allow_show_update_alert')" @change="handleChangeAllowUpdateAlert(api, $event)")
-        base-btn(:class="$style.listBtn" outline :aria-label="$t('user_api__btn_remove')" @click.stop="handleRemove(index)")
+        base-btn(v-if="!isPackaged(api.id)" :class="$style.listBtn" outline :aria-label="$t('user_api__btn_remove')" @click.stop="handleRemove(index)")
           svg(v-once version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 0 212.982 212.982" space="preserve")
             use(xlink:href="#icon-delete")
     div(v-else :class="$style.content")
@@ -31,6 +31,7 @@ material-modal(:show="modelValue" bg-close teleport="#view" @close="handleClose"
 <script>
 import { importUserApi, removeUserApi, showSelectDialog, setAllowShowUserApiUpdateAlert, getUserApiList } from '@renderer/utils/ipc'
 import { readFile } from '@common/utils/nodejs'
+import { PACKAGED_IDS } from '@common/packagedSources'
 import apiSourceInfo from '@renderer/utils/musicSdk/api-source-info'
 import { userApi } from '@renderer/store'
 import { appSetting, updateSetting } from '@renderer/store/setting'
@@ -103,9 +104,12 @@ export default {
     handleExport() {
 
     },
+    isPackaged(id) {
+      return PACKAGED_IDS.has(id)
+    },
     async handleRemove(index) {
       const api = this.apiList[index]
-      if (!api) return
+      if (!api || PACKAGED_IDS.has(api.id)) return
       if (appSetting['common.apiSource'] == api.id) {
         let backApi = apiSourceInfo.find(api => !api.disabled)
         if (!backApi) backApi = userApi.list[0]

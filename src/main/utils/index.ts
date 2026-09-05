@@ -115,6 +115,10 @@ const applyInitSetting = (setting: LX.AppSetting) => {
   setting['openAPI.enable'] = false
   setting['common.showChangeLog'] = false
   setting['network.proxy.enable'] = false
+  const apiSource = String(setting['common.apiSource'] || '')
+  if (!apiSource || apiSource == 'temp' || apiSource == 'kw' || apiSource.startsWith('builtin_') || apiSource == 'user_api_hyw') {
+    setting['common.apiSource'] = 'user_api_xinghai'
+  }
 }
 
 export const updateSetting = (setting?: Partial<LX.AppSetting>, isInit: boolean = false) => {

@@ -96,7 +96,8 @@ export default {
     const snowlitSession = computed(() => snowlitAccountState.session)
     const snowlitListCount = computed(() => {
       if (!snowlitSession.value) return 0
-      return SYNC_FIXED_IDS.length + userLists.filter(info => canSyncListId(info.id) && !(SYNC_FIXED_IDS as readonly string[]).includes(info.id)).length
+      const fixed = new Set(SYNC_FIXED_IDS)
+      return SYNC_FIXED_IDS.length + userLists.filter(info => canSyncListId(info.id) && !fixed.has(info.id)).length
     })
     const syncedCount = computed(() => accountAutoState.syncedCount + snowlitListCount.value)
     const hasLogin = computed(() => accounts.value.some(item => item.loggedIn) || !!snowlitSession.value)

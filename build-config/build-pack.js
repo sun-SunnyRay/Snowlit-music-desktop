@@ -45,6 +45,11 @@ const options = {
   },
   extraResources: [
     './licenses',
+    {
+      from: 'assets/sources',
+      to: 'sources',
+      filter: ['*.js'],
+    },
   ],
   // 本地发行：不配置官方 LX 更新源（避免误更新）
   publish: [],
