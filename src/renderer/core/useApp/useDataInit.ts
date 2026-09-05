@@ -12,7 +12,7 @@ import { playMusicInfo } from '@renderer/store/player/state'
 import { initDislikeInfo, registerRemoteDislikeAction } from '@renderer/core/dislikeList'
 import { ensureAccountPlaylists } from '@renderer/store/sourceAccount'
 import { loadSnowlitSession } from '@renderer/store/snowlitAccount'
-import { onSnowlitLocalListsChanged, syncSnowlitLists } from '@renderer/core/snowlitListSync'
+import { initSnowlitListPull, onSnowlitLocalListsChanged, syncSnowlitLists } from '@renderer/core/snowlitListSync'
 import { initListenRecent } from '@renderer/core/listenRecent'
 
 const initPrevPlayInfo = async() => {
@@ -67,6 +67,7 @@ export default () => {
     void syncSnowlitLists().catch(err => {
       log.error(err)
     })
+    initSnowlitListPull()
     unregisterDislikeEvent = registerRemoteDislikeAction()
     await initDislikeInfo() // 获取不喜欢列表
     await initPrevPlayInfo().catch(err => {

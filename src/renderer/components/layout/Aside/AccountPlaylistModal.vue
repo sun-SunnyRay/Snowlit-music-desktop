@@ -66,7 +66,9 @@ import { useI18n } from '@root/lang'
 import { accountAutoState, ensureAccountPlaylists } from '@renderer/store/sourceAccount'
 import { setSnowlitSession, snowlitAccountState } from '@renderer/store/snowlitAccount'
 import { SNOWLIT_CODE_WAIT_SEC, sendSnowlitCode, SnowlitAccountError, verifySnowlitCode } from '@renderer/core/snowlitAccount'
-import { syncSnowlitLists } from '@renderer/core/snowlitListSync'
+import { refreshSnowlitListPull, syncSnowlitLists } from '@renderer/core/snowlitListSync'
+import { canSyncListId, SYNC_FIXED_IDS } from '@renderer/core/snowlitListSync/ids'
+import { userLists } from '@renderer/store/list/state'
 import {
   getSourceAccountStatus,
   loginSourceAccount,
@@ -91,9 +93,13 @@ export default {
     const snowlitCode = ref('')
     const snowlitBusy = ref(false)
     const snowlitWait = ref(0)
-    const syncedCount = computed(() => accountAutoState.syncedCount)
-    const hasLogin = computed(() => accounts.value.some(item => item.loggedIn))
     const snowlitSession = computed(() => snowlitAccountState.session)
+    const snowlitListCount = computed(() => {
+      if (!snowlitSession.value) return 0
+      return SYNC_FIXED_IDS.length + userLists.filter(info => canSyncListId(info.id) && !(SYNC_FIXED_IDS as readonly string[]).includes(info.id)).length
+    })
+    const syncedCount = computed(() => accountAutoState.syncedCount + snowlitListCount.value)
+    const hasLogin = computed(() => accounts.value.some(item => item.loggedIn) || !!snowlitSession.value)
     let waitTimer = null
 
     const refreshStatus = async() => {
@@ -198,6 +204,7 @@ export default {
         } catch {
           error.value = t('snowlit_list_sync_failed')
         }
+        refreshSnowlitListPull()
       } catch (err) {
         error.value = snowlitError(err, 'login')
       } finally {
@@ -208,14 +215,25 @@ export default {
     const handleSnowlitLogout = async() => {
       await setSnowlitSession(null)
       showSnowlitForm.value = false
+      refreshSnowlitListPull()
     }
 
     const handleRefresh = async() => {
       refreshing.value = true
       error.value = ''
       try {
-        await ensureAccountPlaylists()
-        await refreshStatus()
+        if (accounts.value.some(item => item.loggedIn)) {
+          await ensureAccountPlaylists()
+          await refreshStatus()
+        }
+        if (snowlitSession.value) {
+          try {
+            await syncSnowlitLists()
+          } catch {
+            error.value = t('snowlit_list_sync_failed')
+          }
+          refreshSnowlitListPull()
+        }
       } catch (err) {
         error.value = err.message || String(err)
       } finally {

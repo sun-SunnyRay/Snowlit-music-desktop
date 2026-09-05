@@ -12,7 +12,7 @@ import { userLists } from '@renderer/store/list/state'
 import { snowlitAccountState } from '@renderer/store/snowlitAccount'
 import { askListChoice, getListChoice, setListChoice } from './choice'
 import { canSyncListId, SYNC_FIXED_IDS } from './ids'
-import { mergeListPacks, packHasSongs, pickNewerPacks, syncableTracks } from './shape'
+import { listsNeedApply, mergeListPacks, packHasSongs, pickNewerPacks, syncableTracks } from './shape'
 import { bumpListTimes, readListTimes, writeListTimes } from './times'
 
 const FIXED_NAME: Record<string, string> = {
@@ -22,11 +22,15 @@ const FIXED_NAME: Record<string, string> = {
 }
 
 const PUSH_WAIT_MS = 2000
+const PULL_WAIT_MS = 5000
 
 let applying = false
 let inflight = false
 let queued = false
+let pulling = false
+let pullInited = false
 let timer: ReturnType<typeof setTimeout> | null = null
+let pullTimer: ReturnType<typeof setInterval> | null = null
 let pendingRemoved: SnowlitRemovedList[] = []
 
 const session = () => snowlitAccountState.session
@@ -122,13 +126,8 @@ const putNow = async() => {
   const next = await putSnowlitLists(current.token, lists, pendingRemoved)
   const remoteIds = new Set(next.map(list => list.id))
   pendingRemoved = pendingRemoved.filter(item => remoteIds.has(item.id))
-  const times = await readListTimes()
-  for (const list of next) {
-    const local = lists.find(item => item.id == list.id)
-    if (local && local.updatedAt > list.updatedAt) continue
-    times[list.id] = list.updatedAt
-  }
-  await writeListTimes(times)
+  const changed = listsNeedApply(lists, next)
+  if (changed.length) await applyPack(changed, false)
 }
 
 const flushPush = async() => {
@@ -172,6 +171,50 @@ export const onSnowlitLocalListsChanged = (ids: string[]) => {
   void bumpListTimes(nextIds, now).then(() => { schedulePush() })
 }
 
+const pullNewer = async() => {
+  const current = session()
+  if (!current || applying || inflight || pulling) return
+  pulling = true
+  try {
+    const remote = await fetchSnowlitLists(current.token)
+    const local = await collectLocal()
+    const next = pickNewerPacks(local, remote)
+    const changed = listsNeedApply(local, next)
+    if (changed.length) await applyPack(changed, false)
+  } catch {
+    // next tick
+  } finally {
+    pulling = false
+  }
+}
+
+const stopPull = () => {
+  if (!pullTimer) return
+  clearInterval(pullTimer)
+  pullTimer = null
+}
+
+const startPull = (immediate = true) => {
+  if (!session() || document.hidden) {
+    stopPull()
+    return
+  }
+  if (immediate) void pullNewer()
+  if (pullTimer) return
+  pullTimer = setInterval(() => { void pullNewer() }, PULL_WAIT_MS)
+}
+
+export const refreshSnowlitListPull = () => {
+  startPull(true)
+}
+
+export const initSnowlitListPull = () => {
+  if (pullInited) return
+  pullInited = true
+  document.addEventListener('visibilitychange', () => { startPull(true) })
+  startPull(false)
+}
+
 export const syncSnowlitLists = async() => {
   const current = session()
   if (!current) return
@@ -185,12 +228,7 @@ export const syncSnowlitLists = async() => {
     for (const list of next) times[list.id] = list.updatedAt
     await writeListTimes(times)
   }
-  const localById = new Map(local.map(list => [list.id, list]))
-  const changed = next.filter(list => {
-    const prev = localById.get(list.id)
-    if (!prev) return true
-    return list.updatedAt > prev.updatedAt || list.name != prev.name
-  })
+  const changed = listsNeedApply(local, next)
   if (changed.length || decided.dropLocalOnly) {
     const applyLists = decided.dropLocalOnly ? next : changed
     await applyPack(applyLists, decided.dropLocalOnly)

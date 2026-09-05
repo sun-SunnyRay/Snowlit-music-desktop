@@ -47,3 +47,21 @@ export const pickNewerPacks = (local: SnowlitList[], remote: SnowlitList[]): Sno
   }
   return Array.from(map.values())
 }
+
+const trackSetKey = (tracks: LX.Music.MusicInfo[]) => {
+  const keys = syncableTracks(tracks).map(track => trackKey(track))
+  keys.sort()
+  return keys.join('\n')
+}
+
+export const listNeedsApply = (local: SnowlitList | undefined, incoming: SnowlitList) => {
+  if (!local) return true
+  if (local.name != incoming.name) return true
+  if (incoming.updatedAt > local.updatedAt) return true
+  return trackSetKey(local.tracks) != trackSetKey(incoming.tracks)
+}
+
+export const listsNeedApply = (local: SnowlitList[], incoming: SnowlitList[]) => {
+  const localById = new Map(local.map(list => [list.id, list]))
+  return incoming.filter(list => listNeedsApply(localById.get(list.id), list))
+}
