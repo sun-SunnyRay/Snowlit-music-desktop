@@ -12,7 +12,7 @@ import { userLists } from '@renderer/store/list/state'
 import { snowlitAccountState } from '@renderer/store/snowlitAccount'
 import { askListChoice, getListChoice, setListChoice } from './choice'
 import { canSyncListId, SYNC_FIXED_IDS } from './ids'
-import { listsNeedApply, mergeListPacks, packHasSongs, pickNewerPacks, syncableTracks } from './shape'
+import { listsNeedApply, mergeListPacks, packHasSongs, pickNewerPacks, syncableListTracks } from './shape'
 import { bumpListTimes, readListTimes, writeListTimes } from './times'
 
 const FIXED_NAME: Record<string, string> = {
@@ -45,7 +45,7 @@ const collectLocal = async(): Promise<SnowlitList[]> => {
       id,
       name: FIXED_NAME[id] || id,
       updatedAt: times[id] || 0,
-      tracks: syncableTracks((await getListMusics(id)).map(item => toRaw(item))),
+      tracks: syncableListTracks(id, (await getListMusics(id)).map(item => toRaw(item))),
     })
   }
   for (const info of userLists) {
@@ -54,7 +54,7 @@ const collectLocal = async(): Promise<SnowlitList[]> => {
       id: info.id,
       name: info.name,
       updatedAt: times[info.id] || 0,
-      tracks: syncableTracks((await getListMusics(info.id)).map(item => toRaw(item))),
+      tracks: syncableListTracks(info.id, (await getListMusics(info.id)).map(item => toRaw(item))),
     })
   }
   return lists
@@ -73,19 +73,20 @@ const applyPack = async(lists: SnowlitList[], dropLocalOnly: boolean) => {
       if (drop.length) await removeUserList(drop)
     }
     for (const list of lists) {
+      const tracks = syncableListTracks(list.id, list.tracks)
       if (list.id == LIST_IDS.LOVE || list.id == LIST_IDS.DEFAULT || list.id == LIST_IDS.RECENT) {
-        await overwriteListMusics({ listId: list.id, musicInfos: list.tracks })
+        await overwriteListMusics({ listId: list.id, musicInfos: tracks })
         continue
       }
       const prev = userLists.find(info => info.id == list.id)
       if (!prev) {
-        await createUserList({ id: list.id, name: list.name, list: list.tracks })
+        await createUserList({ id: list.id, name: list.name, list: tracks })
         continue
       }
       if (prev.name != list.name) {
         await updateUserList([{ ...toRaw(prev), name: list.name }])
       }
-      await overwriteListMusics({ listId: list.id, musicInfos: list.tracks })
+      await overwriteListMusics({ listId: list.id, musicInfos: tracks })
     }
     const times = await readListTimes()
     for (const list of lists) times[list.id] = list.updatedAt

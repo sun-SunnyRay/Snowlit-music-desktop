@@ -198,7 +198,7 @@ export const musicsAdd = (listId: string, musicInfos: LX.Music.MusicInfo[], addM
   let targetList = getListMusics(listId)
 
   if (listId == LIST_IDS.LOVE) {
-    musicOverwrite(listId, upsertLoveInto(targetList, musicInfos, addMusicLocationType))
+    musicOverwrite(listId, collapseLoveList(upsertLoveInto(targetList, musicInfos, addMusicLocationType)))
     return
   }
 
@@ -250,7 +250,7 @@ export const musicsMove = (fromId: string, toId: string, musicInfos: LX.Music.Mu
   const ids = musicInfos.map(musicInfo => musicInfo.id)
 
   if (toId == LIST_IDS.LOVE) {
-    const next = upsertLoveInto(toList, musicInfos, addMusicLocationType)
+    const next = collapseLoveList(upsertLoveInto(toList, musicInfos, addMusicLocationType))
     if (fromId != toId) {
       removeMusicInfos(fromId, ids)
       const idsSet = new Set<string>(ids)

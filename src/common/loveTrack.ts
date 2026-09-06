@@ -1,25 +1,14 @@
-const SINGER_SPLIT = /[,，、/&;；|]/
-
-const normName = (name: string) => name.replace(/\s+/g, '').toLowerCase()
-
-const splitSingers = (singer: string) => {
-  return singer.split(SINGER_SPLIT).map(item => item.trim().toLowerCase()).filter(Boolean)
-}
-
-const singersOverlap = (a: string, b: string) => {
-  const left = splitSingers(a)
-  const right = splitSingers(b)
-  if (!left.length || !right.length) return !!a && !!b && a.trim().toLowerCase() == b.trim().toLowerCase()
-  const set = new Set(left)
-  return right.some(item => set.has(item))
+const normName = (name: string) => {
+  if (!name) return ''
+  return name.normalize('NFKC').replace(/\s+/g, '').toLowerCase()
 }
 
 export const sameLoveTrack = (
-  a: { name: string, singer: string },
-  b: { name: string, singer: string },
+  a: { name: string },
+  b: { name: string },
 ) => {
-  if (normName(a.name) != normName(b.name)) return false
-  return singersOverlap(a.singer, b.singer)
+  const left = normName(a.name)
+  return !!left && left == normName(b.name)
 }
 
 export const isLovedMusic = (list: LX.Music.MusicInfo[], music: LX.Music.MusicInfo) => {

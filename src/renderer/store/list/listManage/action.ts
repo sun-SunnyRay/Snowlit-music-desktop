@@ -9,7 +9,7 @@ import {
 } from './state'
 import { overwriteListPosition, overwriteListUpdateInfo, removeListPosition, removeListUpdateInfo } from '@renderer/utils/data'
 import { LIST_IDS } from '@common/constants'
-import { upsertLoveInto } from '@common/loveTrack'
+import { collapseLoveList, upsertLoveInto } from '@common/loveTrack'
 import { arrPush, arrUnshift } from '@common/utils/common'
 
 export const setUserLists = (lists: LX.List.UserListInfo[]) => {
@@ -132,7 +132,7 @@ export const listDataOverwrite = ({ defaultList, loveList, userList, tempList }:
     updatedListIds.push(LIST_IDS.DEFAULT)
   }
 
-  overwriteMusicList(LIST_IDS.LOVE, loveList)
+  overwriteMusicList(LIST_IDS.LOVE, collapseLoveList(loveList))
   updatedListIds.push(LIST_IDS.LOVE)
 
   if (tempList && allMusicList.has(LIST_IDS.TEMP)) {
@@ -209,7 +209,7 @@ export const userListsUpdatePosition = (position: number, ids: string[]) => {
 
 export const listMusicOverwrite = (listId: string, musicInfos: LX.Music.MusicInfo[]): string[] => {
   const isExist = allMusicList.has(listId)
-  overwriteMusicList(listId, musicInfos)
+  overwriteMusicList(listId, listId == loveList.id ? collapseLoveList(musicInfos) : musicInfos)
   return isExist || listId == loveList.id || listId == defaultList.id || listId == recentList.id ? [listId] : []
 }
 
@@ -229,7 +229,7 @@ export const listMusicAdd = (id: string, musicInfos: LX.Music.MusicInfo[], addMu
   if (!targetList) return id == loveList.id ? [id] : []
 
   if (id == loveList.id) {
-    const next = upsertLoveInto(targetList, musicInfos, addMusicLocationType)
+    const next = collapseLoveList(upsertLoveInto(targetList, musicInfos, addMusicLocationType))
     for (const item of next) markRaw(item)
     targetList.splice(0, targetList.length)
     arrPush(targetList, next)

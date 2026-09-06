@@ -17,7 +17,7 @@ version = {floor(versionCode / 10)}.{versionCode % 10}.0
 | 99 | 9.9.0 |
 | 100 | 10.0.0 |
 
-当前：`versionCode` **99**，`version` **9.9.0**。下一发先跑 `npm run bump-version`（100 → 10.0.0）。
+当前：`versionCode` **102**，`version` **10.2.0**。下一发先跑 `npm run bump-version`（103 → 10.3.0）。
 
 覆盖安装认单调递增的 `versionCode`（打进 electron-builder 的 `buildVersion`），不认第三位。
 

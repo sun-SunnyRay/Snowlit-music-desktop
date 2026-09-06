@@ -1,3 +1,5 @@
+import { LIST_IDS } from '@common/constants'
+import { collapseLoveList } from '@common/loveTrack'
 import type { SnowlitList } from '@renderer/core/snowlitAccount'
 
 const trackKey = (track: LX.Music.MusicInfo) => `${track.source}\0${track.id}`
@@ -15,15 +17,21 @@ export const syncableTracks = (tracks: LX.Music.MusicInfo[]) => {
   return next
 }
 
+export const syncableListTracks = (listId: string, tracks: LX.Music.MusicInfo[]) => {
+  const next = syncableTracks(tracks)
+  if (listId == LIST_IDS.LOVE) return collapseLoveList(next)
+  return next
+}
+
 export const packHasSongs = (lists: SnowlitList[]) => lists.some(list => list.tracks.length > 0)
 
 export const mergeListPacks = (local: SnowlitList[], remote: SnowlitList[]): SnowlitList[] => {
   const map = new Map<string, SnowlitList>()
-  for (const list of local) map.set(list.id, { ...list, tracks: syncableTracks(list.tracks) })
+  for (const list of local)     map.set(list.id, { ...list, tracks: syncableListTracks(list.id, list.tracks) })
   for (const list of remote) {
     const prev = map.get(list.id)
     if (!prev) {
-      map.set(list.id, { ...list, tracks: syncableTracks(list.tracks) })
+      map.set(list.id, { ...list, tracks: syncableListTracks(list.id, list.tracks) })
       continue
     }
     const newer = list.updatedAt >= prev.updatedAt ? list : prev
@@ -32,7 +40,7 @@ export const mergeListPacks = (local: SnowlitList[], remote: SnowlitList[]): Sno
       id: newer.id,
       name: newer.name,
       updatedAt: Math.max(list.updatedAt, prev.updatedAt),
-      tracks: syncableTracks([...newer.tracks, ...older.tracks]),
+      tracks: syncableListTracks(newer.id, [...newer.tracks, ...older.tracks]),
     })
   }
   return Array.from(map.values())
